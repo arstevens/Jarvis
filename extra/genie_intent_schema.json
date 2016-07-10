@@ -1,0 +1,134 @@
+{
+  "intents": [
+    {
+      "intent": "ExperimentStartIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentSelectionIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        },{
+          "name": "ExperimentName",
+          "type": "LIST_OF_EXPERIMENT"
+        }]
+    },
+    {
+      "intent": "ExperimentGelSelectionIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        },{
+          "name": "GelName",
+          "type": "LIST_OF_GEL"
+        }]
+    },
+    {
+      "intent": "ExperimentGelMixtureStartIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentGelMixtureEndIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentGelMixtureDoneIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentLoadingGelStartIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentLoadingWellCountIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        },
+        {
+          "name": "WellCount",
+          "type": "AMAZON.NUMBER"
+        }]
+    },
+    {
+      "intent": "ExperimentLoadingSampleAssignmentIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        },
+        {
+          "name": "SampleType",
+          "type": "LIST_SAMPLE_TYPE"
+        },
+        {
+          "name": "WellNumber",
+          "type": "AMAZON.NUMBER"
+        }]
+    },
+    {
+      "intent": "ExperimentLoadingGelDoneIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentPowerSupplyStartIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentPowerSupplyCheckIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentPowerSupplyEndIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentEndIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentHelpIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    },
+    {
+      "intent": "ExperimentStatusCheckIntent",
+      "slots": [{
+          "name": "UserName",
+          "type": "LIST_OF_USER"
+        }]
+    }
+  ]
+}

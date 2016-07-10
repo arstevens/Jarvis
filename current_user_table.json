@@ -1,0 +1,12 @@
+{
+	"schema_name":"jarvis",
+	"table_name":"current_user",
+	"comment":"the table that will store the current user of Jarvis",
+	"annotations": {},
+	"column_definitions": [{"comment":{},"default":{},"type":{"typename":"text"},
+				"annotations":{},"name":"user"}],
+	"keys":[{"comment":{},"annotations":{},"unique_columns":["user"]}],
+	"foreign_keys":[],
+	"kind":"table"
+}
+

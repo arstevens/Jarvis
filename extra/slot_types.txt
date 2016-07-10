@@ -1,0 +1,23 @@
+LIST_OF_USER
+Anurag
+Anoop
+
+LIST_OF_EXPERIMENT
+Gel electrophorises
+
+LIST_OF_GEL
+Polyacrylamide
+Agarose
+
+LIST_SAMPLE_TYPE
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+
