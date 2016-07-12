@@ -97,6 +97,12 @@ class JarvisBaseState(object):
 			return True
 		except:
 			return False
+
+	def _get_experiment_id(self,request):
+		if (self._slot_exists("EID",request)):
+			return self._get_slot_value("EID",request)
+		else:
+			return None
 		
 	def _clear(self,table_name):
 		clean_data = self._ermrest.get_data(7,table_name,"")[0]

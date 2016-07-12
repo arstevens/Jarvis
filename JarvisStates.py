@@ -63,7 +63,7 @@ class GetExperimentState(JarvisBaseState):
 			return "BuildResponseState"
 	
 	def _get_last_step(self):
-		experiment_id = self._get_experiment_id()
+		experiment_id = self._get_experiment_id(self._request)
 		experiment = self._get_experiment(experiment_id)
 		steps_completed = experiment['states_completed'].split(",")
 		last_step = steps_completed[len(steps_completed)-1]
@@ -80,12 +80,6 @@ class GetExperimentState(JarvisBaseState):
 			self.logger.error(str(exc))
 			return {} 
 	
-	def _get_experiment_id(self):
-		if (self._slot_exists("EID",self._request)):
-			return self._get_slot_value("EID",self._request)
-		else:
-			return None
-
 #===================================Login==============================================
 class LoginState(JarvisBaseState):
 	
@@ -135,11 +129,15 @@ class ValidateState(JarvisBaseState):
 
 	def handle_input(self):
 		last_step = self._get_completed_step()
-		next_step = self._get_next_step(last_step)
 		intent_name = self._get_intent_name(request)
+		if (last_step == None and intent_name == "ExperimentStartIntent"):
+			return "IntentState"
+		next_step = self._get_next_step(last_step)
 		valid_intents = self._possible_intent_mappings[last_step]
 		if intent_name in valid_intents:
-			self._set_completed_step(self._steps[next_step]
+			if intent_name != "ExperimentGelMixtureDoneIntent" and 
+				intent_name != "ExperimentPowerSupplyCheckIntent":
+				self._set_completed_step(self._steps[next_step]
 			return "IntentState"
 		else:
 			self._speech_ouput = "Your input was invalid. If not, check the logs"
@@ -148,7 +146,9 @@ class ValidateState(JarvisBaseState):
 
 	
 	def _get_completed_step(self):
-		last_step = self._ermrest.get_data(7,"step_completed","")[0]['completed_step']
+		last_step = None
+		try:
+			last_step = self._ermrest.get_data(7,"step_completed","")[0]['completed_step']
 		return last_step
 	
 	def _get_next_step(self,last_step):
@@ -156,3 +156,43 @@ class ValidateState(JarvisBaseState):
 			if step == last_step:
 				return step
 		return False 
+
+#===================================IntentState==============================================
+class IntentState(JarvisBaseState):
+	
+	def __init__(self,request,session):
+		super(self.__class__,self).__init__()
+		self._request = request
+		self._session = session
+		self._user = self._ermrest.get_data(7,"session_info","")[0]["user"]
+		self._intent = self._get_intent_name(request)
+		self._experiment_id = self._get_experiment_id(self._request)
+		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest)
+	
+	def handle_input(self):
+		if self._intent == "ExperimentStartIntent":
+			self._experiment_handler.experiment_start_intent()
+		elif self._intent == "ExperimentSelectionIntent":
+			self._experiment_handler.experiment_selection_intent("experiment_name")
+		elif self._intent == "ExperimentGelSelectionIntent":
+			self._experiment_handler.experiment_gel_selection_intent("gel_type")
+		elif self._intent == "ExperimentGelMixtureStartIntent":
+			self._experiment_handler.experiment_gel_mixture_start_intent()
+		elif self._intent == "ExperimentGelMixtureEndIntent":
+			self._experiment_handler.experiment_gel_mixture_end_intent()
+		elif self._intent == "ExperimentGelMixtureDoneIntent":
+			self._experiment_handler.experiment_gel_mixture_done_intent()
+		elif self._intent == "ExperimentLoadingGelStartIntent":
+			self._experiment_handler.experiment_loading_gel_start_intent()
+		elif self._intent == "ExperimentLoadingWellCountIntent":
+			self._experiment_handler.experiment_loading_well_count_intent("count")
+		elif self._intent == "ExperimentLoadingSampleAssignmentIntent":
+			self._experiment_handler.experiment_loading_sample_assignment_intent("sampletype",
+												"#")
+		elif self._intent == "ExperimentLoadingGelDoneIntent":
+			self._experiment_handler.experiment_gel_loading_done_intent()
+		elif self._intent == "ExperimentPowerSupplyStartIntent":
+			self._experiment_handler.experiment_power_supply_start_intent()
+		elif self._intent == "ExperimentPowerSupplyCheckIntent":
+			self._experiment_handler.experiment_power_supply_check_intent()
+	
