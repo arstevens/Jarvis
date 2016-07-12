@@ -1,0 +1,12 @@
+{
+	"schema_name":"jarvis",
+	"table_name":"step_completed",
+	"comment":"the table that will contain the most recent step in an experiment you have completed", 
+	"annotations": {},
+	"column_definitions": [{"comment":{},"default":{},"type":{"typename":"text"},
+				"annotations":{},"name":"completed_step"}],
+	"keys":[{"comment":{},"annotations":{},"unique_columns":["completed_step"]}],
+	"foreign_keys":[],
+	"kind":"table"
+}
+

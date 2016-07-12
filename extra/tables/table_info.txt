@@ -1,0 +1,11 @@
+Catalog: 7
+Schema: 'jarvis'
+tables: 'session_info','experiment_data'
+
+data_insert:
+
+	session_info: {"user":user,"current_intent":current_intent,"jarvis_response":jarvis_response}
+
+	experiment_data: {"experiment_id":eid,"user":user,"experiment":experiment,"start_date":sd,
+			"end_date":"ed,"states_completed":sc,"gel_type":gt,"sample_count":sc,
+			"power_supply_start_time":pswt,"power_supply_end_time":pset}

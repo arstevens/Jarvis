@@ -1,4 +1,6 @@
 import abc
+import logging
+from ErmrestHandler import ErmrestHandler
 
 class JarvisBaseState(object):
 
@@ -10,8 +12,12 @@ class JarvisBaseState(object):
 		self._speech_output = "Jarvis speech output"
 		self._card_title = "Alexa app card title"
 		self._card_output = "Alexa app card output"
+		self._steps = ['exp-start','exp-selection','get-selection','mixture-start','mixture-end',
+		'gel-loading-start','sample-count','gel-loading-end','power-start','power-end','exp-end']
+		self.logger = logging.getLogger()
 		self._reprompt_text = "Jarvis speech reprompt"
 		self._should_end_session = False
+		self._ermrest = ErmrestHandler("ec2-54-172-182-170.compute-1.amazonaws.com","root","root")
 	
 	@abc.abstractmethod
 	def handle_input(self):
@@ -65,6 +71,42 @@ class JarvisBaseState(object):
 
         	return value
 	
-	def _get_current_user(self,ermrest_handler):
-		current_user = ermrest_handler.get_table_data(7,"current_user")
-		return current_user
+	def _get_current_user(self):
+		current_user = self._ermrest.get_data(7,"session_info","")[0]
+		return current_user['user']
+	
+	def _set_session_data(self,column,new_data):
+		user = self._get_current_user()
+		extra_data = "/user="+user
+		current_data = self._ermrest.get_data(7,"session_info",extra_data)[0]
+		current_data[column] = new_data
+		try:
+			self._ermrest.delete_data(7,"session_info",extra_data)
+			self._ermrest.put_data(7,"session_info",current_data)
+			return True
+		except Exception as exc:
+			self.logger.error(str(exc))
+			return False
+
+	def _set_completed_step(self,new_step):
+		data = self._ermrest.get_data(7,"step_completed","")[0]
+		data['completed_step'] = new_step
+		try:
+			self._ermrest.delete_data(7,"step_completed","")
+			self._ermrest.put_data(7,"step_completed",data)
+			return True
+		except:
+			return False
+		
+	def _clear(self,table_name):
+		clean_data = self._ermrest.get_data(7,table_name,"")[0]
+		for key in clean_data:
+			clean_data[key] = None
+
+		try:
+			self._ermrest.delete_data(7,table_name)
+			self._ermrest.put_data(7,table_name,clean_data)
+			return True
+		except Exception as exc:
+			self.logger.error(str(exc))
+			return False

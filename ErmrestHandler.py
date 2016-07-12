@@ -60,21 +60,16 @@ class ErmrestHandler(object):
 
 		r.raise_for_status()
 
-    	def get_data(self, catalog_id, table_name, user_name):
+    	def get_data(self, catalog_id, table_name, extra_info=""):
         	r = requests.get("http://"+self.host+"/ermrest/catalog/"+str(catalog_id)+"/entity/"+
-                         	table_name+"/user="+user_name, cookies=self._cookie)
+                         	table_name+extra_info, cookies=self._cookie)
         	return json.loads(r.text)
 
-	def get_table_data(self,catalog_id,table_name):
-		r = requests.get("http://"+self.host+"/ermrest/catalog/"+str(catalog_id)+"/entity/"+
-				table_name,cookies=self._cookie)
-		return json.loads(r.text)
-
-    	def delete_data(self, catalog_id, table_name, user_name):
+    	def delete_data(self, catalog_id, table_name, extra_info=""):
         	r = requests.delete("http://"+self.host+"/ermrest/catalog/"+str(catalog_id)+"/entity/"+
-                         	table_name+"/user="+user_name, cookies=self._cookie)
+                         	table_name+extra_info, cookies=self._cookie)
 
-		r.raise_for_status()	
+		r.raise_for_status()
 
     	def put_data(self, catalog_id, table_name, data):
 		#data must be in a python dict type and in the correct table format.

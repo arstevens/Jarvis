@@ -1,17 +1,14 @@
-ExperimentStartIntent {UserName} here I am going to start an experiment
-ExperimentSelectionIntent {UserName} here I am starting {ExperimentName}
-ExperimentGelSelectionIntent {UserName} here It will be {GelName} based Gel
-ExperimentGelMixtureStartIntent {UserName} here I have mixed the agar with water and kept it to boil
-ExperimentGelMixtureEndIntent {UserName} here Mixture seems to be ready
-ExperimentGelMixtureDoneIntent {UserName} here Gel is mixed and is ready to be used
-ExperimentLoadingGelStartIntent {UserName} here I am going to load samples in the well
-ExperimentLoadingWellCountIntent {UserName} here there are {WellCount} samples
-ExperimentLoadingSampleAssignmentIntent {UserName} here assign sample {SampleType} to well {WellNumber}
-ExperimentLoadingGelDoneIntent {UserName} here I have loaded the gel in electrophoresis chamber
-ExperimentPowerSupplyStartIntent {UserName} here I have started the power supply
-ExperimentPowerSupplyCheckIntent {UserName} here Can I turn off the power supply
-ExperimentPowerSupplyEndIntent {UserName} here I have turned off the power supply
-ExperimentEndIntent {UserName} here I have recorded the readings and cleaned up
-ExperimentHelpIntent {UserName} here what should I do next
-ExperimentStatusCheckIntent {UserName} here what was I doing
-ExperimentStatusCheckIntent {UserName} here where was I
+ExperimentStartIntent I am going to start an experiment
+ExperimentSelectionIntent I am starting {ExperimentName}
+ExperimentGelSelectionIntent It will be a {GelName} based Gel
+ExperimentGelMixtureStartIntent I have mixed the agar with water and kept it to boil
+ExperimentGelMixtureEndIntent The mixture seems to be ready
+ExperimentGelMixtureDoneIntent The gel is mixed and is ready to be used
+ExperimentLoadingGelStartIntent I am going to load samples in the well
+ExperimentLoadingWellCountIntent There are {WellCount} samples
+ExperimentLoadingSampleAssignmentIntent Assign sample {SampleType} to well {WellNumber}
+ExperimentLoadingGelDoneIntent I have loaded the gel in the electrophoresis chamber
+ExperimentPowerSupplyStartIntent I have started the power supply
+ExperimentPowerSupplyCheckIntent Can I turn off the power supply
+ExperimentPowerSupplyEndIntent I have turned off the power supply
+ExperimentEndIntent I have recorded the readings and cleaned up

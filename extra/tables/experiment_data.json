@@ -1,7 +1,7 @@
 {
-	"schema_name":"test",
-	"table_name":"test1",
-	"comment":"testing",
+	"schema_name":"jarvis",
+	"table_name":"experiment_data",
+	"comment":"where experiment data is held",
 	"annotations": {},
 	"column_definitions": [{"comment":{},"default":{},"type":{"typename":"int4"},
 				"annotations":{},"name":"experiment_id"},
@@ -20,7 +20,7 @@
 				"annotations": {}, "name": "power_supply_start_time"}, 
 				{"comment":{}, "default":{}, "type": {"typename": "text"}, 
 				"annotations": {}, "name": "power_supply_end_time"}],
-	"keys":[{"comment":{},"annotations":{},"unique_columns":["user","experiment"]}],
+	"keys":[{"comment":{},"annotations":{},"unique_columns":["user","experiment_id"]}],
 	"foreign_keys":[],
 	"kind":"table"
 }
