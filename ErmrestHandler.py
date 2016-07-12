@@ -65,6 +65,11 @@ class ErmrestHandler(object):
                          	table_name+"/user="+user_name, cookies=self._cookie)
         	return json.loads(r.text)
 
+	def get_table_data(self,catalog_id,table_name):
+		r = requests.get("http://"+self.host+"/ermrest/catalog/"+str(catalog_id)+"/entity/"+
+				table_name,cookies=self._cookie)
+		return json.loads(r.text)
+
     	def delete_data(self, catalog_id, table_name, user_name):
         	r = requests.delete("http://"+self.host+"/ermrest/catalog/"+str(catalog_id)+"/entity/"+
                          	table_name+"/user="+user_name, cookies=self._cookie)

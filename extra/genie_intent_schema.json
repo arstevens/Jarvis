@@ -129,6 +129,13 @@
           "name": "UserName",
           "type": "LIST_OF_USER"
         }]
+    },
+    {
+      "intent": "ExperimentContinueIntent",
+      "slots": [{
+          "name": "EID",
+	  "type": "EXPERIMENT_ID"
+	  }]
     }
   ]
 }

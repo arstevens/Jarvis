@@ -1,4 +1,3 @@
-__author__ = 'anurag'
 from ErmrestHandler import ErmrestHandler
 import logging
 import time
