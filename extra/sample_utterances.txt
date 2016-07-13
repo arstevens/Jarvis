@@ -1,3 +1,6 @@
+LoginIntent Log in user {UserName}
+LogoutIntent Log me out 
+ExperimentOpenIntent Open experiment number {EID}
 ExperimentStartIntent I am going to start an experiment
 ExperimentSelectionIntent I am starting {ExperimentName} and the id is {EID}
 ExperimentGelSelectionIntent It will be a {GelName} based Gel

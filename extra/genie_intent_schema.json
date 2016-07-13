@@ -1,141 +1,102 @@
 {
-  "intents": [
-    {
-      "intent": "ExperimentStartIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentSelectionIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        },{
-          "name": "ExperimentName",
-          "type": "LIST_OF_EXPERIMENT"
-        }]
-    },
-    {
-      "intent": "ExperimentGelSelectionIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        },{
-          "name": "GelName",
-          "type": "LIST_OF_GEL"
-        }]
-    },
-    {
-      "intent": "ExperimentGelMixtureStartIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentGelMixtureEndIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentGelMixtureDoneIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentLoadingGelStartIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentLoadingWellCountIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        },
-        {
-          "name": "WellCount",
-          "type": "AMAZON.NUMBER"
-        }]
-    },
-    {
-      "intent": "ExperimentLoadingSampleAssignmentIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        },
-        {
-          "name": "SampleType",
-          "type": "LIST_SAMPLE_TYPE"
-        },
-        {
-          "name": "WellNumber",
-          "type": "AMAZON.NUMBER"
-        }]
-    },
-    {
-      "intent": "ExperimentLoadingGelDoneIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentPowerSupplyStartIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentPowerSupplyCheckIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentPowerSupplyEndIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentEndIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentHelpIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentStatusCheckIntent",
-      "slots": [{
-          "name": "UserName",
-          "type": "LIST_OF_USER"
-        }]
-    },
-    {
-      "intent": "ExperimentContinueIntent",
-      "slots": [{
-          "name": "EID",
-	  "type": "EXPERIMENT_ID"
-	  }]
-    }
-  ]
-}
+	"intents": [
+		{
+			"intent": "LoginIntent",
+			"slots":[
+				{
+					"name": "UserName",
+					"type": "LIST_OF_USERS"
+				}
+				]
+		},
+		{
+			"intent": "LogoutIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentOpenIntent",
+			"slots":[
+				{
+					"name":"EID",
+					"type": "ID"
+				}
+				]
+		},
+		{
+			"intent": "ExperimentStartIntent",
+			"slots": []
+		},
+		{
+			"intent": "ExperimentSelectionIntent",
+			"slots": [
+				{
+					"name": "ExperimentName",
+					"type": "LIST_OF_EXPERIMENT"
+				},
+				{
+					"name":"EID",
+					"type":"ID"
+				}
+				]
+		},
+		{
+			"intent": "ExperimentGelSelectionIntent",
+			"slots": [
+				{
+					"name": "GelName",
+					"type": "LIST_OF_GELS"
+				}
+				]
+		},
+		{
+			"intent": "ExperimentGelMixtureStartIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentGelMixtureEndIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentGelMixtureDoneIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentLoadingGelStartIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentLoadingWellCountIntent",
+			"slots":[
+				{
+					"name": "WellCount",
+					"type": "WELL_TYPE"
+				}
+				]
+		},
+		{
+			"intent": "ExperimentLoadingSampleAssignmentIntent",
+			"slots":[
+			{
+				"name": "SampleType",
+				"type": "WellNumber"
+			}
+			]
+		},
+		{
+			"intent": "ExperimentLoadingGelDoneIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentPowerSupplyCheckIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentPowerSupplyEndIntent",
+			"slots":[]
+		},
+		{
+			"intent": "ExperimentEndIntent",
+			"slots":[]
+		}
+	
+	

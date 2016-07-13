@@ -28,10 +28,8 @@ class GetIntentState(JarvisBaseState):
 
 		if intent_name == "LogoutIntent":
 			return "LogoutState"
-		elif intent_name == "ExperimentStartIntent":
-			return "NewExperimentIntent"
-		elif intent_name == "OpenExperimentIntent":
-			return "OpenExperimentState"
+		elif intent_name == "ExperimentOpenIntent":
+			return "GetExperimentState"
 		else:
 			return "ValidateState"
 	
@@ -61,24 +59,6 @@ class GetExperimentState(JarvisBaseState):
 			self._speech_output = "Something went wrong. Check the logs" 
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "BuildResponseState"
-	
-	def _get_last_step(self):
-		experiment_id = self._get_experiment_id(self._request)
-		experiment = self._get_experiment(experiment_id)
-		steps_completed = experiment['states_completed'].split(",")
-		last_step = steps_completed[len(steps_completed)-1]
-		return last_step
-
-	def _get_experiment(self,experiment_id):
-		experiment_id = str(experiment_id)
-		user = self._get_current_user()
-		query = "/user="+user+"/experiment_id="+experiment_id
-		try:
-			experiment = self._ermrest.get_data(7,"experiment_data",query)
-			return experiment	
-		except Exception as exc:
-			self.logger.error(str(exc))
-			return {} 
 	
 #===================================Login==============================================
 class LoginState(JarvisBaseState):
@@ -143,10 +123,13 @@ class ValidateState(JarvisBaseState):
 	def handle_input(self):
 		last_step = self._get_completed_step()
 		intent_name = self._get_intent_name(request)
+		
 		if (last_step == None and intent_name == "ExperimentStartIntent"):
 			return "IntentState"
+		
 		next_step = self._get_next_step(last_step)
 		valid_intents = self._possible_intent_mappings[last_step]
+		
 		if intent_name in valid_intents:
 			if (intent_name != "ExperimentGelMixtureDoneIntent" and 
 				intent_name != "ExperimentPowerSupplyCheckIntent"):
@@ -215,6 +198,7 @@ class IntentState(JarvisBaseState):
 			self._speech_output = self._experiment_handler.experiment_end_intent()
 
 		self._set_session_data("jarvis_response",self._speech_output)
+		self._set_completed_step(self._get_last_step())
 	
 		return "BuildResponseState"
 

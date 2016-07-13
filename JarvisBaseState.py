@@ -116,3 +116,22 @@ class JarvisBaseState(object):
 		except Exception as exc:
 			self.logger.error(str(exc))
 			return False
+
+	def _get_last_step(self):
+		experiment_id = self._get_experiment_id(self._request)
+		experiment = self._get_experiment(experiment_id)
+		steps_completed = experiment['states_completed'].split(",")
+		last_step = steps_completed[len(steps_completed)-1]
+		return last_step
+
+	def _get_experiment(self,experiment_id):
+		experiment_id = str(experiment_id)
+		user = self._get_current_user()
+		query = "/user="+user+"/experiment_id="+experiment_id
+		try:
+			experiment = self._ermrest.get_data(7,"experiment_data",query)
+			return experiment	
+		except Exception as exc:
+			self.logger.error(str(exc))
+			return {} 
+	
