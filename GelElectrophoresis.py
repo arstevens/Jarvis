@@ -127,11 +127,4 @@ class GelElectrophoresis(object):
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return self.user+", your experiment is completed."
 
-	#Need to implement the help intents and create a seperate help class
-	def experiment_help_intent(self):
-		return self.get_next_state_info()
-
-	def experiment_status_check_intent(self):
-		return self.user+", this is what you have done so far."
-
-
+	#Need to implement the help intents and create a seperate help center class
