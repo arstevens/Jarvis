@@ -27,10 +27,8 @@ class GetIntentState(JarvisBaseState):
 		intent_name = self._get_intent_name(request)
 
 		if intent_name == "LogoutIntent":
-			return "LogoutState"
-		elif intent_name == "ExperimentStartIntent":
-			return "NewExperimentIntent"
-		elif intent_name == "OpenExperimentIntent":
+			return "LoginState"
+		elif intent_name == "ExperimentOpenIntent":
 			return "OpenExperimentState"
 		else:
 			return "ValidateState"
