@@ -90,7 +90,10 @@ class GelElectrophoresis(object):
 		return "Go ahead and allocate the samples to individual wells"
 
 	def experiment_loading_sample_assigment_intent(self, sample_type, well_number):
-		#todo: assign samples to well numbers
+		self.data['samples'] = sample_type
+		self.data['well_numbers'] = well_number
+		self.reset_user_data()
+		self._ermrest.put_data(self._catalog,self._table_name,self.data)
 		return "Copy that"
 
 	def experiment_gel_loading_done_intent(self):

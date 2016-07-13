@@ -8,4 +8,5 @@ data_insert:
 
 	experiment_data: {"experiment_id":eid,"user":user,"experiment":experiment,"start_date":sd,
 			"end_date":"ed,"states_completed":sc,"gel_type":gt,"sample_count":sc,
+			"samples":samples,"well_numbers":well_numbers,
 			"power_supply_start_time":pswt,"power_supply_end_time":pset}
