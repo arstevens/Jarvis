@@ -5,9 +5,7 @@
 	"annotations": {},
 	"column_definitions": [{"comment":{},"default":{},"type":{"typename":"text"},
 				"annotations":{},"name":"user"},{"comment":{},"default":{},
-				"type":{"typename":"text"},"annotations":{},"name":"current_intent"},
-				{"comment":{},"default":{},"type":{"typename":"text"},"annotations":
-				{},"name":"jarvis_response"}],
+				"type":{"typename":"text"},"annotations":{},"name":"jarvis_response"}],
 	"keys":[{"comment":{},"annotations":{},"unique_columns":["user"]}],
 	"foreign_keys":[],
 	"kind":"table"

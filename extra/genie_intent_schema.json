@@ -78,7 +78,11 @@
 			"slots":[
 			{
 				"name": "SampleType",
-				"type": "WellNumber"
+				"type": "SAMPLE_TYPE"
+			},
+			{
+				"name": "WellNumber",
+				"type": "WELL_TYPE"
 			}
 			]
 		},
