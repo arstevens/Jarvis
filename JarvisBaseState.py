@@ -10,13 +10,8 @@ class JarvisBaseState(object):
 		self._request = "request variable goes here" 
 		self._session = "session variable goes here"
 		self._speech_output = "Jarvis speech output"
-		self._card_title = "Alexa app card title"
-		self._card_output = "Alexa app card output"
-		self._steps = ['exp-start','exp-selection','get-selection','mixture-start','mixture-end',
-		'gel-loading-start','sample-count','gel-loading-end','power-start','power-end','exp-end']
 		self.logger = logging.getLogger()
 		self._reprompt_text = "Sorry. I didn't get that"
-		self._should_end_session = False
 		self._ermrest = ErmrestHandler("ec2-54-172-182-170.compute-1.amazonaws.com","root","root")
 	
 	@abc.abstractmethod
@@ -50,13 +45,6 @@ class JarvisBaseState(object):
 			return slot_name in intent['slots']
 		else:
 			return False
-
-	@staticmethod
-	def _get_session_attribute(session):
-		if 'attributes' in session:
-			return session['attributes']
-		else:
-			return dict()
 
 	def _get_slot_value(self, slot_name, intent_request):
 		value = None
