@@ -1,6 +1,4 @@
-<h2>Jarvis lab assistant using Amazon echo and AWS lambda.
-How to create a lambda function in
-Python that can be used in an Alexa Skill.</h2>
+<h2>Jarvis lab assistant using Amazon echo and AWS lambda.</h2>
 
 <h2>AlexaBaseHandler class</h2>
 
