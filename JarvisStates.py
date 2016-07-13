@@ -95,9 +95,9 @@ class LoginState(JarvisBaseState):
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "BuildResponseState"	
 		else:
-			self._speech_output = "No user is logged in at the moment. 
+			self._speech_output = """No user is logged in at the moment. 
 					Please provide your username and 
-					your session will begin."
+					your session will begin."""
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "BuildResponseState"
 	
@@ -107,6 +107,19 @@ class LoginState(JarvisBaseState):
 		else:
 			return None
 
+#===================================Logout==============================================
+class LogoutState(JarvisBaseState):
+
+	def __init__(self,request,session):
+		super(self.__class__,self).__init__()
+		self._request = request
+		self._session = session
+	
+	def handle_input(self):
+		self._clear("session_info")
+		self._clear("step_completed")
+		return "BuildResponseState"
+		
 #===================================Validate==============================================
 class ValidateState(JarvisBaseState):
 	
@@ -135,9 +148,9 @@ class ValidateState(JarvisBaseState):
 		next_step = self._get_next_step(last_step)
 		valid_intents = self._possible_intent_mappings[last_step]
 		if intent_name in valid_intents:
-			if intent_name != "ExperimentGelMixtureDoneIntent" and 
-				intent_name != "ExperimentPowerSupplyCheckIntent":
-				self._set_completed_step(self._steps[next_step]
+			if (intent_name != "ExperimentGelMixtureDoneIntent" and 
+				intent_name != "ExperimentPowerSupplyCheckIntent"):
+				self._set_completed_step(self._steps[next_step])
 			return "IntentState"
 		else:
 			self._speech_ouput = "Your input was invalid. If not, check the logs"
@@ -149,6 +162,8 @@ class ValidateState(JarvisBaseState):
 		last_step = None
 		try:
 			last_step = self._ermrest.get_data(7,"step_completed","")[0]['completed_step']
+		except Exception as exc:
+			self.logger.error(str(exc))
 		return last_step
 	
 	def _get_next_step(self,last_step):
@@ -157,7 +172,7 @@ class ValidateState(JarvisBaseState):
 				return step
 		return False 
 
-#===================================IntentState==============================================
+#===================================Intent==============================================
 class IntentState(JarvisBaseState):
 	
 	def __init__(self,request,session):
@@ -171,28 +186,94 @@ class IntentState(JarvisBaseState):
 	
 	def handle_input(self):
 		if self._intent == "ExperimentStartIntent":
-			self._experiment_handler.experiment_start_intent()
+			self._speech_output = self._experiment_handler.experiment_start_intent()
 		elif self._intent == "ExperimentSelectionIntent":
-			self._experiment_handler.experiment_selection_intent("experiment_name")
+			self._speech_output = self._experiment_handler.experiment_selection_intent("experiment_name")
 		elif self._intent == "ExperimentGelSelectionIntent":
-			self._experiment_handler.experiment_gel_selection_intent("gel_type")
+			self._speech_output = self._experiment_handler.experiment_gel_selection_intent("gel_type")
 		elif self._intent == "ExperimentGelMixtureStartIntent":
-			self._experiment_handler.experiment_gel_mixture_start_intent()
+			self_speech_output = self._experiment_handler.experiment_gel_mixture_start_intent()
 		elif self._intent == "ExperimentGelMixtureEndIntent":
-			self._experiment_handler.experiment_gel_mixture_end_intent()
+			self._speech_output = self._experiment_handler.experiment_gel_mixture_end_intent()
 		elif self._intent == "ExperimentGelMixtureDoneIntent":
-			self._experiment_handler.experiment_gel_mixture_done_intent()
+			self._speech_output = self._experiment_handler.experiment_gel_mixture_done_intent()
 		elif self._intent == "ExperimentLoadingGelStartIntent":
-			self._experiment_handler.experiment_loading_gel_start_intent()
+			self._speech_output = self._experiment_handler.experiment_loading_gel_start_intent()
 		elif self._intent == "ExperimentLoadingWellCountIntent":
-			self._experiment_handler.experiment_loading_well_count_intent("count")
+			self._speech_output = self._experiment_handler.experiment_loading_well_count_intent("count")
 		elif self._intent == "ExperimentLoadingSampleAssignmentIntent":
-			self._experiment_handler.experiment_loading_sample_assignment_intent("sampletype",
-												"#")
+			self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent("sampletype","#")
 		elif self._intent == "ExperimentLoadingGelDoneIntent":
-			self._experiment_handler.experiment_gel_loading_done_intent()
+			self._speech_output = self._experiment_handler.experiment_gel_loading_done_intent()
 		elif self._intent == "ExperimentPowerSupplyStartIntent":
-			self._experiment_handler.experiment_power_supply_start_intent()
+			self._speech_output = self._experiment_handler.experiment_power_supply_start_intent()
 		elif self._intent == "ExperimentPowerSupplyCheckIntent":
-			self._experiment_handler.experiment_power_supply_check_intent()
+			self._speech_output = self._experiment_handler.experiment_power_supply_check_intent()
+		elif self._intent == "ExperimentPowerSupplyEndIntent":
+			self._speech_output = self._experiment_handler.experiment_power_supply_end_intent()
+		elif self._intent == "ExperimentEndIntent":
+			self._speech_output = self._experiment_handler.experiment_end_intent()
+
+		self._set_session_data("jarvis_response",self._speech_output)
 	
+		return "BuildResponseState"
+
+#===================================BuildResponse==============================================
+class BuildResponseState(JarvisBaseState):
+
+	def __init__(self,request,session):
+		super(self.__class__,self).__init__()
+		self._request = request
+		self._session = session
+		try:
+			self._speech_output = self._ermrest.get_data(7,"session_info","")[0]["jarvis_response"]
+		except:
+			self._speech_output = "Goodbye."
+
+	def handle_input(self):
+		session_attributes = self._get_session_attribute(session)
+		response = self._build_response(session_attributes)
+		return response
+
+	def _build_speechlet_response(self):
+		"""
+		Internal helper method to build the speechlet portion of the response
+		:param card_title:
+		:param card_output:
+		:param speech_output:
+		:param reprompt_text:
+		:param should_end_session:
+		:return:
+		"""
+		return {
+			'outputSpeech': {
+				'type': 'PlainText',
+				'text': self._speech_output
+				},
+			'card': {
+				'type': 'Simple',
+				'title': {}, 
+				'content': {} 
+				},
+			'reprompt': {
+				'outputSpeech': {
+					'type': 'PlainText',
+					'text': self._reprompt_text
+						}
+					},
+			'shouldEndSession': self._should_end_session
+			}
+
+	def _build_response(self, session_attributes):
+		"""
+		Internal helper method to build the Alexa response message
+		:param session_attributes:
+		:param speechlet_response:
+		:return: properly formatted Alexa response
+		"""
+		return {
+			'version': '1.0',
+			'sessionAttributes': session_attributes,
+			'response': self._build_speechlet_response()
+			}
+

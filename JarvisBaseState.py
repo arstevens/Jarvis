@@ -15,7 +15,7 @@ class JarvisBaseState(object):
 		self._steps = ['exp-start','exp-selection','get-selection','mixture-start','mixture-end',
 		'gel-loading-start','sample-count','gel-loading-end','power-start','power-end','exp-end']
 		self.logger = logging.getLogger()
-		self._reprompt_text = "Jarvis speech reprompt"
+		self._reprompt_text = "Sorry. I didn't get that"
 		self._should_end_session = False
 		self._ermrest = ErmrestHandler("ec2-54-172-182-170.compute-1.amazonaws.com","root","root")
 	
