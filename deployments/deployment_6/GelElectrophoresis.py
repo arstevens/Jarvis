@@ -1,5 +1,5 @@
 from ErmrestHandler import ErmrestHandler
-import logging
+import json
 import time
 
 class GelElectrophoresis(object):
@@ -9,10 +9,10 @@ class GelElectrophoresis(object):
 		self._ermrest = ermrest_handler
 		self._table_name = "experiment_data"
 		self._catalog = 7
-		self._experiment_id = str(experiment_id)
+		self._experiment_id = experiment_id
 		try:
 			self.data = json.loads(self._ermrest.get_data(7,self._table_name,"/user="+
-						self.user+"/experiment_id="+experiment_id))
+						self.user+"/experiment_id="+str(experiment_id)))
 		except:
 			self.data = {"experiment_id":experiment_id,"user":self.user,"experiment":None,
 					"start_date":None,"end_date":None,"states_completed":None,
@@ -32,18 +32,19 @@ class GelElectrophoresis(object):
 	def reset_user_data(self):
 		try:
 			self._ermrest.delete_data(self._catalog,self._table_name,"/user="+self.user+
-							"/experiment_id="+self._experiment_id)
+							"/experiment_id="+str(self._experiment_id))
 		except Exception as exc:
-			self.logger.error(str(exc))
+			print("reset user data error:"+str(exc))
 
 	def experiment_start_intent(self):
 		return "Hello "+self.user+" Which experiment are you going to start"
 
 	def experiment_selection_intent(self, experiment_name):
 		#todo: check experiment_name is it allowed?
-		self.data['start_date'] = str(time.asctime(time.localtime(time.time())))
+		self.data['start_date'] = str(time.time())
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
+		self.data['experiment_id'] = int(self._experiment_id)
 		self.data['experiment'] = experiment_name
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Will it be a Polyacrylamide or Agarose based Gel"
@@ -53,7 +54,7 @@ class GelElectrophoresis(object):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-selection')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		self.logger.info("Gel type: "+str(self.data))
+		print("Gel type: "+str(self.data))
 		return "Alright "+self.user+" Go ahead and prepare your "+gel_type+" based gel"
 
 	def experiment_gel_mixture_start_intent(self):

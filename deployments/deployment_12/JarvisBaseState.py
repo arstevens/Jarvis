@@ -74,13 +74,21 @@ class JarvisBaseState(object):
 			return False
 
 	def _set_completed_step(self,new_step):
-		data = self._ermrest.get_data(7,"step_completed")[0]
+		print("in set completed step")
+		try:
+			data = self._ermrest.get_data(7,"step_completed")[0]
+			self._ermrest.delete_data(7,"step_completed")
+			print("got old step")
+		except:
+			data = {"completed_step":None}
+			print("got blank step")
 		data['completed_step'] = new_step
 		try:
-			self._ermrest.delete_data(7,"step_completed")
 			self._ermrest.put_data(7,"step_completed",data)
+			print("put data in step completed")
 			return True
 		except:
+			print("put data failed")
 			return False
 
 	def _get_experiment_slot_id(self,request):
@@ -103,14 +111,14 @@ class JarvisBaseState(object):
 			return False
 
 	def _get_last_step(self,experiment_id):
-		print("last step start")
-		experiment = self._get_experiment(experiment_id)
-		print("got experiment: ".format(experiment))
-		steps_completed = experiment['states_completed'].split(",")
-		print("decompressed steps")
-		last_step = steps_completed[len(steps_completed)-1]
-		print("returning last step")
+		experiment = self._ermrest.get_data(7,"experiment_data","/experiment_id="+str(experiment_id))[0]
+		print("got experiment: "+str(experiment))
+		steps = experiment['states_completed'].split(",")
+		print("split steps: "+str(steps))
+		last_step = steps[len(steps)-1]
+		print("got last step: "+str(last_step))
 		return last_step
+
 
 	def _get_experiment(self,experiment_id):
 		experiment_id = str(experiment_id)

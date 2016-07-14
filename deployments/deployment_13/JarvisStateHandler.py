@@ -11,7 +11,8 @@ class JarvisStateHandler(object):
 		self._ermrest = ermrest
 		self._return_value = None 
 		print("making states")
-		self._states = {"AuthenticateState":AuthenticateState(self._request,self._session,self._ermrest),
+		try:
+			self._states = {"AuthenticateState":AuthenticateState(self._request,self._session,self._ermrest),
 				"GetIntentState":GetIntentState(self._request,self._session,self._ermrest),
 				"GetExperimentState":GetExperimentState(self._request,self._session,self._ermrest),
 				"LoginState":LoginState(self._request,self._session,self._ermrest),
@@ -19,6 +20,8 @@ class JarvisStateHandler(object):
 				"ValidateState":ValidateState(self._request,self._session,self._ermrest),
 				"IntentState":IntentState(self._request,self._session,self._ermrest),
 				"ReturnState":ReturnState(self._request,self._session,self._ermrest)}
+		except Exception as exc:
+			print("State Creation Error: "+str(exc))
 		print("made states")
 		self.current_state = self._states["AuthenticateState"]
 		print("made current state")

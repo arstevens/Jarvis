@@ -2,7 +2,6 @@
 from JarvisBaseState import JarvisBaseState
 from ErmrestHandler import ErmrestHandler
 from GelElectrophoresis import GelElectrophoresis
-from text2num import text2num
 #===================================Authenticate==============================================
 class AuthenticateState(JarvisBaseState):
 	
@@ -198,7 +197,9 @@ class IntentState(JarvisBaseState):
 
 		elif self._intent == "ExperimentGelSelectionIntent":
 			gel_type = self._get_slot_value("GelName",self._request)
+			print("get slot value exception: "+str(exc))
 			self._speech_output = self._experiment_handler.experiment_gel_selection_intent(gel_type)
+			print("experiment handler exception: "+str(exc))
 	
 		elif self._intent == "ExperimentLoadingWellCountIntent":
 			well_count = self._get_slot_value("WellCount",self._request)
@@ -225,9 +226,16 @@ class IntentState(JarvisBaseState):
 		elif self._intent == "ExperimentEndIntent":
 			self._speech_output = self._experiment_handler.experiment_end_intent()
 
+		
 		self._set_session_data("jarvis_response",self._speech_output)
+		print("set jarvis response")
 		if self._intent != "ExperimentStartIntent":
-			self._set_completed_step(self._get_last_step(self._experiment_id))
+			print("in if statement for start intent")
+			try:
+				self._set_completed_step(self._get_last_step(self._experiment_id))
+				print("set completed step")
+			except Exception as exc:
+				print("Set completed step error: "+str(exc))
 		return "ReturnState"
 	
 	def _get_experiment_id(self,request,ermrest):
@@ -235,8 +243,8 @@ class IntentState(JarvisBaseState):
 			return None
 		elif (self._intent == "ExperimentSelectionIntent" or
 			self._intent == "ExperimentOpenIntent"):
-			eid = text2num(self._get_experiment_slot_id(request)).convert()
-			self._set_session_info("current_experiment_id",eid)
+			eid = int(self._get_experiment_slot_id(request))
+			self._set_session_data("current_experiment_id",eid)
 		else:
 			eid = ermrest.get_data(7,"session_info")[0]['current_experiment_id']
 		return eid
@@ -254,7 +262,10 @@ class ReturnState(JarvisBaseState):
 	def handle_input(self):
 		#All this class does is return the response value. 
 		#Not needed just makes the state machine make more sense.	
-		response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		try:
+			response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		except:
+			response = "Goodbye." #Logout clears all of the tables so this is the default.
 		print("returning speech")
 		return str(response)
 

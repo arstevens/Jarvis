@@ -154,7 +154,7 @@ class ValidateState(JarvisBaseState):
 
 		else:
 			print("going to return state: invalid intent")
-			self._speech_ouput = "Your input was invalid. If not, check the logs"
+			self._speech_output = "Your input was invalid. If not, check the logs"
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
 
@@ -206,7 +206,7 @@ class IntentState(JarvisBaseState):
 		elif self._intent == "ExperimentStartIntent":
 			self._speech_output = self._experiment_handler.experiment_start_intent()
 		elif self._intent == "ExperimentGelMixtureStartIntent":
-			self_speech_output = self._experiment_handler.experiment_gel_mixture_start_intent()
+			self._speech_output = self._experiment_handler.experiment_gel_mixture_start_intent()
 		elif self._intent == "ExperimentGelMixtureEndIntent":
 			self._speech_output = self._experiment_handler.experiment_gel_mixture_end_intent()
 		elif self._intent == "ExperimentGelMixtureDoneIntent":
@@ -225,11 +225,11 @@ class IntentState(JarvisBaseState):
 			self._speech_output = self._experiment_handler.experiment_end_intent()
 
 		
+		print(self._speech_output)
 		self._set_session_data("jarvis_response",self._speech_output)
 		print("set jarvis response")
 		if self._intent != "ExperimentStartIntent":
 			print("in if statement for start intent")
-			print(self._get_last_step(self._experiment_id))
 			try:
 				self._set_completed_step(self._get_last_step(self._experiment_id))
 				print("set completed step")
@@ -261,7 +261,11 @@ class ReturnState(JarvisBaseState):
 	def handle_input(self):
 		#All this class does is return the response value. 
 		#Not needed just makes the state machine make more sense.	
-		response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		try:
+			response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		except:
+			response = "Goodbye." #Logout clears all of the tables so this is the default.
+		print(response)
 		print("returning speech")
 		return str(response)
 

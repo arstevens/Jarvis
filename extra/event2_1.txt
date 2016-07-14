@@ -1,0 +1,33 @@
+{
+  "session": {
+    "sessionId": "SessionId.d34c8590-f935-4cd2-acc9-81b0160c96d9",
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.1cf5a523-7c5c-4858-a2bf-5139853f7010"
+    },
+    "attributes": {},
+    "user": {
+      "userId": "amzn1.ask.account.AFP3ZWPOS2BGJR7OWJZ3DHPKMOMNWY4AY66FUR7ILBWANIHQN73QG6THIZO45Y7Q5OG6II7U2DHQEL2VLX7G3YFTKQEZSVWB3FWZWIDM5F2I6E62IRDB4CSFATGSOWA53G7QWMFWMZK5PXBP344Z74UMH7WU43EPDUXCM5QLIBG3BXMB2TWK565LCPEWQQ2B5CG3IZQGD2YZZYQ"
+    },
+    "new": true
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "EdwRequestId.36536b36-1096-4901-aebb-aa14dfcc047a",
+    "timestamp": "2016-07-14T02:45:02Z",
+    "intent": {
+      "name": "ExperimentSelectionIntent",
+      "slots": {
+	"EID": {
+		"name":"EID",
+		"value":"20"	
+	},
+	"ExperimentName":{
+		"name":"ExperimentName",
+		"value":"gel electrophoresis"
+	}
+    },
+    "locale": "en-US"
+  },
+  "version": "1.0"
+}
+}

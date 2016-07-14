@@ -1,5 +1,4 @@
 from ErmrestHandler import ErmrestHandler
-import logging
 import json
 import time
 
@@ -12,9 +11,10 @@ class GelElectrophoresis(object):
 		self._catalog = 7
 		self._experiment_id = experiment_id
 		try:
-			self.data = json.loads(self._ermrest.get_data(7,self._table_name,"/user="+
-						self.user+"/experiment_id="+str(experiment_id)))
-		except:
+			self.data = json.loads(json.dumps(self._ermrest.get_data(7,self._table_name,"/user="+
+						self.user+"/experiment_id="+str(experiment_id))[0]))
+		except Exception as exc:
+			print("grab data error:"+str(exc))
 			self.data = {"experiment_id":experiment_id,"user":self.user,"experiment":None,
 					"start_date":None,"end_date":None,"states_completed":None,
 					"gel_type":None,"sample_count":None,"power_supply_start_time":None,
@@ -33,9 +33,9 @@ class GelElectrophoresis(object):
 	def reset_user_data(self):
 		try:
 			self._ermrest.delete_data(self._catalog,self._table_name,"/user="+self.user+
-							"/experiment_id="+self._experiment_id)
+							"/experiment_id="+str(self._experiment_id))
 		except Exception as exc:
-			self.logger.error(str(exc))
+			print("reset user data error:"+str(exc))
 
 	def experiment_start_intent(self):
 		return "Hello "+self.user+" Which experiment are you going to start"
@@ -45,7 +45,7 @@ class GelElectrophoresis(object):
 		self.data['start_date'] = str(time.time())
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
-		self.data['experiment_id'] = self._experiment_id
+		self.data['experiment_id'] = int(self._experiment_id)
 		self.data['experiment'] = experiment_name
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Will it be a Polyacrylamide or Agarose based Gel"
@@ -55,7 +55,6 @@ class GelElectrophoresis(object):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-selection')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		self.logger.info("Gel type: "+str(self.data))
 		return "Alright "+self.user+" Go ahead and prepare your "+gel_type+" based gel"
 
 	def experiment_gel_mixture_start_intent(self):
@@ -68,13 +67,7 @@ class GelElectrophoresis(object):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-end')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Alright "+self.user+", cool it for sometime and then load the samples in the wells"
-
-	def experiment_gel_mixture_done_intent(self):
-		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-end')
-		self.reset_user_data()
-		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Go ahead and load the sample in the wells."
+		return "Alright "+self.user+", cool it for some time and then load the samples in the wells"
 
 	def experiment_loading_gel_start_intent(self):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-start')

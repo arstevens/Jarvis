@@ -121,7 +121,7 @@ class ValidateState(JarvisBaseState):
 		self._session = session
 		self._ermrest = ermrest
 		#maps last step completed to what you can do next in order prevent step jumping
-		self._possible_intent_mappings = {'exp-start': ["ExperimentSelectionIntent"],
+		self._possible_intent_mappings = {
 					'exp-selection': ["ExperimentGelSelectionIntent"],
 					'gel-selection':["ExperimentGelMixtureStartIntent"],
 					'mixture-start':["ExperimentGelMixtureEndIntent","ExperimentGelMixtureDoneIntent"],
@@ -143,8 +143,9 @@ class ValidateState(JarvisBaseState):
 			valid_intents = None
 		print(valid_intents)
 		
-		if (last_step == None and intent_name == "ExperimentStartIntent"):
-			print("experiment start: going to intent state")
+		if (last_step == None and (intent_name == "ExperimentStartIntent" or
+						intent_name == "ExperimentSelectionIntent")):
+			print("going to intent state")
 			return "IntentState"
 		
 		if intent_name in valid_intents:
@@ -180,7 +181,7 @@ class IntentState(JarvisBaseState):
 		self._ermrest = ermrest
 		self._user = self._ermrest.get_data(7,"session_info","")[0]["user"]
 		self._intent = self._get_intent_name(request)
-		self._experiment_id = self._get_experiment_id(self._request)
+		self._experiment_id = self._get_experiment_id(self._request,self._ermrest)
 		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest)
 	
 	def handle_input(self):
@@ -195,8 +196,14 @@ class IntentState(JarvisBaseState):
 			self._speech_output = self._experiment_handler.experiment_selection_intent(experiment_name)
 
 		elif self._intent == "ExperimentGelSelectionIntent":
-			gel_type = self._get_slot_value("GelName",self._request)
-			self._speech_output = self._experiment_handler.experiment_gel_selection_intent(gel_type)
+			try:
+				gel_type = self._get_slot_value("GelName",self._request)
+			except Exception as exc:
+				print("get slot value exception: "+str(exc))
+			try:
+				self._speech_output = self._experiment_handler.experiment_gel_selection_intent(gel_type)
+			except Exception as exc:
+				print("experiment handler exception: "+str(exc))
 	
 		elif self._intent == "ExperimentLoadingWellCountIntent":
 			well_count = self._get_slot_value("WellCount",self._request)
@@ -223,10 +230,29 @@ class IntentState(JarvisBaseState):
 		elif self._intent == "ExperimentEndIntent":
 			self._speech_output = self._experiment_handler.experiment_end_intent()
 
+		
 		self._set_session_data("jarvis_response",self._speech_output)
+		print("set jarvis response")
 		if self._intent != "ExperimentStartIntent":
-			self._set_completed_step(self._get_last_step())
+			print("in if statement for start intent")
+			try:
+				self._set_completed_step(self._get_last_step(self._experiment_id))
+				print("set completed step")
+			except Exception as exc:
+				print("Set completed step error: "+str(exc))
 		return "ReturnState"
+	
+	def _get_experiment_id(self,request,ermrest):
+		if (self._intent == "ExperimentStartIntent"):
+			return None
+		elif (self._intent == "ExperimentSelectionIntent" or
+			self._intent == "ExperimentOpenIntent"):
+			eid = int(self._get_experiment_slot_id(request))
+			self._set_session_data("current_experiment_id",eid)
+		else:
+			eid = ermrest.get_data(7,"session_info")[0]['current_experiment_id']
+		return eid
+		
 	
 #===================================BuildResponse==============================================
 class ReturnState(JarvisBaseState):
@@ -240,7 +266,10 @@ class ReturnState(JarvisBaseState):
 	def handle_input(self):
 		#All this class does is return the response value. 
 		#Not needed just makes the state machine make more sense.	
-		response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		try:
+			response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		except:
+			response = "Goodbye." #Logout clears all of the tables so this is the default.
 		print("returning speech")
 		return str(response)
 

@@ -6,7 +6,7 @@ ExperimentSelectionIntent I am starting {ExperimentName} and the id is {EID}
 ExperimentGelSelectionIntent It will be a {GelName} based Gel
 ExperimentGelMixtureStartIntent I have mixed the agar with water and kept it to boil
 ExperimentGelMixtureEndIntent The mixture seems to be ready
-ExperimentGelMixtureDoneIntent The gel is mixed and is ready to be used
+ExperimentGelMixtureEndIntent The gel is mixed and is ready to be used
 ExperimentLoadingGelStartIntent I am going to load samples in the well
 ExperimentLoadingWellCountIntent There are {WellCount} samples
 ExperimentLoadingSampleAssignmentIntent Assign sample {SampleType} to well {WellNumber}

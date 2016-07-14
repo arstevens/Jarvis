@@ -39,8 +39,11 @@ class AlexaJarvisHandler(AlexaBaseHandler):
 	def on_intent(self, request, session):
 		self.logger.info("on_intent")
 		session_attributes = self._get_session_attribute(session)
+		print("made attribute")
 		jarvis_state_handler = JarvisStateHandler(request,session,self._ermrest)
+		print("Made state handler")
 		self._speech_output = jarvis_state_handler.handle_states()
+		print("created speech output:"+self._speech_output)
 		return self._build_response(session_attributes) 
 
 	def on_session_ended(self, request, session):
