@@ -5,8 +5,10 @@
 	"annotations": {},
 	"column_definitions": [{"comment":{},"default":{},"type":{"typename":"text"},
 				"annotations":{},"name":"user"},{"comment":{},"default":{},
-				"type":{"typename":"text"},"annotations":{},"name":"jarvis_response"}],
-	"keys":[{"comment":{},"annotations":{},"unique_columns":["user"]}],
+				"type":{"typename":"text"},"annotations":{},"name":"jarvis_response"},
+				{"comment":{},"default":{},"type":{"typename":"int4"},"annotations":{},
+				"name":"current_experiment_id"}],
+	"keys":[{"comment":{},"annotations":{},"unique_columns":["user","current_experiment_id"]}],
 	"foreign_keys":[],
 	"kind":"table"
 }
