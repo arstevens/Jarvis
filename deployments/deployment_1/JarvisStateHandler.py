@@ -15,13 +15,13 @@ class JarvisStateHandler(object):
 				"GetUserDataState":GetUserDataState(self._request,self._session),
 				"ValidateState":ValidateState(self._request,self._session),
 				"IntentState":IntentState(self._request,self._session),
-				"BuildResponseState":BuildResponseState(self._request,self._session)}
+				"ReturnState":ReturnState(self._request,self._session)}
 		self.current_state = self._states["AuthenticateState"]
 	
 	def handle_states(self):
 		while (True):
 			new_state = self.current_state.handle_input()
-			if (type(new_state) != str):
+			if (new_state not in self._states): #checks to see if what was returned could be the alexa response value
 				self._return_value = new_state
 				break
 			else:

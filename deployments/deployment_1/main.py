@@ -18,6 +18,9 @@ logger.setLevel(logging.INFO)
 def lambda_handler(event, context):
 	logging.info("Executing main lambda_handler for AlexaBuddyHandler class")
 
+	logger.info(str(event))
+	logger.info(str(context))
+
 	alexa = AlexaJarvisHandler	
 	alexa_response = AlexaJarvisHandler.process_request(event,context)
 

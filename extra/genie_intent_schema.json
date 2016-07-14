@@ -91,6 +91,10 @@
 			"slots":[]
 		},
 		{
+			"intent": "ExperimentPowerSupplyStartIntent",
+			"slots":[]
+		},
+		{
 			"intent": "ExperimentPowerSupplyCheckIntent",
 			"slots":[]
 		},
@@ -102,5 +106,6 @@
 			"intent": "ExperimentEndIntent",
 			"slots":[]
 		}
-	
+	]
+}
 	

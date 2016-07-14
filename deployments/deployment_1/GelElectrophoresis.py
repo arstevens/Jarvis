@@ -19,14 +19,15 @@ class GelElectrophoresis(object):
 					"gel_type":None,"sample_count":None,"power_supply_start_time":None,
 					"power_supply_end_time":None}
 
-	def add_state(self, state, new_state):
-		if state is None or len(state) == 0:
-			state = [new_state]
+	def add_item(self, data, item):
+		#adds item to a string based list that is held in ermrest.
+		if data is None or len(data) == 0:
+			data = [item]
 		else:
-			state = state.split(',')
-			state.append(new_state)
+			data = data.split(',')
+			data.append(item)
 
-		return ','.join(state)
+		return ','.join(data)
 		
 	def reset_user_data(self):
 		try:
@@ -37,14 +38,14 @@ class GelElectrophoresis(object):
 
 	def experiment_start_intent(self):
 		self.data['start_date'] = str(time.asctime(time.localtime(time.time())))
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'exp-start')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
 		self._reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Hello "+self.user+" Which experiment are you going to start"
 
 	def experiment_selection_intent(self, experiment_name):
 		#todo: check experiment_name is it allowed?
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'exp-selection')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
 		self.data['experiment'] = experiment_name
 		self._reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
@@ -52,45 +53,48 @@ class GelElectrophoresis(object):
 
 	def experiment_gel_selection_intent(self, gel_type):
 		self.data['gel_type'] = gel_type
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'gel-selection')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-selection')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		self.logger.info("Gel type: "+str(self.data))
 		return "Alright "+self.user+" Go ahead and prepare your "+gel_type+" based gel"
 
 	def experiment_gel_mixture_start_intent(self):
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'mixture-start')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-start')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Alright "+self.user+", Lets wait for the mixture to boil"
 
 	def experiment_gel_mixture_end_intent(self):
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'mixture-end')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-end')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Alright "+self.user+", cool it for sometime and then load the samples in the wells"
 
 	def experiment_gel_mixture_done_intent(self):
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'mixture-end')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-end')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Go ahead and load the sample in the wells."
 
 	def experiment_loading_gel_start_intent(self):
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'gel-loading-start')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-start')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "How many samples you are going to experiment with"
 
 	def experiment_loading_well_count_intent(self, count):
 		self.data['sample_count'] = count
-		self.data['states_completed'] = self.add_state(self.data['states_completed'], 'sample-count')
+		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'sample-count')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return "Go ahead and allocate the samples to individual wells"
 
 	def experiment_loading_sample_assigment_intent(self, sample_type, well_number):
-		#todo: assign samples to well numbers
+		self.data['samples'] = self.add_item(self.data['samples'], sample_type) 
+		self.data['well_numbers'] = self.add_item(self.data['well_numbers'], well_number)
+		self.reset_user_data()
+		self._ermrest.put_data(self._catalog,self._table_name,self.data)
 		return "Copy that"
 
 	def experiment_gel_loading_done_intent(self):
@@ -127,11 +131,4 @@ class GelElectrophoresis(object):
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return self.user+", your experiment is completed."
 
-	#Need to implement the help intents and create a seperate help class
-	def experiment_help_intent(self):
-		return self.get_next_state_info()
-
-	def experiment_status_check_intent(self):
-		return self.user+", this is what you have done so far."
-
-
+	#Need to implement the help intents and create a seperate help center class

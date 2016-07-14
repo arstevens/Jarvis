@@ -22,9 +22,8 @@ def lambda_handler(event, context):
 	logger.info(str(context))
 
 	alexa = AlexaJarvisHandler	
-	alexa_response = AlexaJarvisHandler.process_request(event,context)
+	alexa_response = alexa.process_request(event,context)
 
 	return alexa_response
-
 
 

@@ -1,0 +1,1 @@
+{u'timestamp': u'2016-07-13T23:12:13Z', u'type': u'IntentRequest', u'requestId': u'EdwRequestId.ce6bd026-96df-44c2-a6f4-5e67a70c4b93', u'intent': {u'slots': {u'UserName': {u'name': u'UserName', u'value': u'Alex'}}, u'name': u'LoginIntent'}}

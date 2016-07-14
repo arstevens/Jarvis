@@ -1,6 +1,7 @@
 #===================================Imports===================================================
 from JarvisBaseState import JarvisBaseState
 from ErmrestHandler import ErmrestHandler
+from GelElectrophoresis import GelElectrophoresis
 #===================================Authenticate==============================================
 class AuthenticateState(JarvisBaseState):
 	
@@ -68,6 +69,7 @@ class LoginState(JarvisBaseState):
 		if (username):
 			self._speech_output = "Hello {}. Your session has begun".format(username)
 			self._set_session_data("jarvis_response",self._speech_output)
+			self._set_session_data("user",username)
 			return "ReturnState"
 		else:
 			self._speech_output = """No user is logged in at the moment. 
@@ -140,7 +142,7 @@ class ValidateState(JarvisBaseState):
 		try:
 			last_step = self._ermrest.get_data(7,"step_completed")[0]['completed_step']
 		except Exception as exc:
-			self.logger.error(str(exc))
+			print(str(exc))
 		return last_step
 	
 #===================================Intent==============================================

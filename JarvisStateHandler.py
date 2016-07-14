@@ -12,7 +12,6 @@ class JarvisStateHandler(object):
 				"GetExperimentState":GetExperimentState(self._request,self._session),
 				"LoginState":LoginState(self._request,self._session),
 				"LogoutState":LogoutState(self._request,self._session),
-				"GetUserDataState":GetUserDataState(self._request,self._session),
 				"ValidateState":ValidateState(self._request,self._session),
 				"IntentState":IntentState(self._request,self._session),
 				"ReturnState":ReturnState(self._request,self._session)}
