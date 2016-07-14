@@ -1,0 +1,24 @@
+{
+  "session": {
+    "sessionId": "SessionId.1cc60212-a3ae-45da-9201-fd0fa5e45293",
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.6ea37510-f9f5-41c9-989f-e67b493b2466"
+    },
+    "attributes": {},
+    "user": {
+      "userId": "amzn1.ask.account.AFP3ZWPOS2BGJR7OWJZ3DHPKMOMNWY4AY66FUR7ILBWANIHQN73QHX66IWFQPPYZ4N6EXSF2R4ZVX56ZHUZDIVY75A5CA2ZXFGMGBQA5WAUVYHANTBFOUFT7SXENLOSZTXLFDY5SLZP6S3JTXFVF6W5BZL3QNXXG4JO6PWLBW7FLOU35GE2R2JDKNC2KXCEUUZ6VEHOLYVQTYFQ"
+    },
+    "new": true
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "EdwRequestId.307d98a5-b702-4d79-96f6-69188d926e4f",
+    "timestamp": "2016-07-14T20:26:15Z",
+    "intent": {
+      "name": "ExperimentGelMixtureEndIntent",
+      "slots": {}
+    },
+    "locale": "en-US"
+  },
+  "version": "1.0"
+}
