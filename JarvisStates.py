@@ -187,8 +187,11 @@ class IntentState(JarvisBaseState):
 	def handle_input(self):
 		print("in IntentState")
 		if self._intent == "ExperimentLoadingSampleAssignmentIntent":
-			sample_type = self._get_slot_value("SampleType",self._request)
-			well_number = self._get_slot_value("WellNumber",self._request)
+			try:
+				sample_type = self._get_slot_value("SampleType",self._request)
+				well_number = self._get_slot_value("WellNumber",self._request)
+			except Exception as exc:
+				print("grab sample type and well number error:"+str(exc))
 			self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent(sample_type,well_number)	
 
 		elif self._intent == "ExperimentSelectionIntent":
