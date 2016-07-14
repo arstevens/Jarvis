@@ -10,9 +10,8 @@ class JarvisBaseState(object):
 		self._request = "request variable goes here" 
 		self._session = "session variable goes here"
 		self._speech_output = "Jarvis speech output"
-		self.logger = logging.getLogger()
 		self._reprompt_text = "Sorry. I didn't get that"
-		self._ermrest = ErmrestHandler("ec2-54-172-182-170.compute-1.amazonaws.com","root","root")
+		self._ermrest = "Ermrest Handler goes here" 
 	
 	@abc.abstractmethod
 	def handle_input(self):
@@ -55,7 +54,7 @@ class JarvisBaseState(object):
 			else:
 				value = None
         	except Exception as exc:
-            		self.logger.error("Error getting slot value for slot_name={0}".format(slot_name))
+            		print("Error getting slot value for slot_name={0}".format(slot_name))
 
         	return value
 	
@@ -64,23 +63,21 @@ class JarvisBaseState(object):
 		return current_user['user']
 	
 	def _set_session_data(self,column,new_data):
-		user = self._get_current_user()
-		extra_data = "/user="+user
-		current_data = self._ermrest.get_data(7,"session_info",extra_data)[0]
+		current_data = self._ermrest.get_data(7,"session_info")[0]
 		current_data[column] = new_data
 		try:
-			self._ermrest.delete_data(7,"session_info",extra_data)
+			self._ermrest.delete_data(7,"session_info")
 			self._ermrest.put_data(7,"session_info",current_data)
 			return True
 		except Exception as exc:
-			self.logger.error(str(exc))
+			print(str(exc))
 			return False
 
 	def _set_completed_step(self,new_step):
-		data = self._ermrest.get_data(7,"step_completed","")[0]
+		data = self._ermrest.get_data(7,"step_completed")[0]
 		data['completed_step'] = new_step
 		try:
-			self._ermrest.delete_data(7,"step_completed","")
+			self._ermrest.delete_data(7,"step_completed")
 			self._ermrest.put_data(7,"step_completed",data)
 			return True
 		except:
@@ -102,7 +99,7 @@ class JarvisBaseState(object):
 			self._ermrest.put_data(7,table_name,clean_data)
 			return True
 		except Exception as exc:
-			self.logger.error(str(exc))
+			print(str(exc))
 			return False
 
 	def _get_last_step(self):
@@ -110,6 +107,7 @@ class JarvisBaseState(object):
 		experiment = self._get_experiment(experiment_id)
 		steps_completed = experiment['states_completed'].split(",")
 		last_step = steps_completed[len(steps_completed)-1]
+		print("returning last step")
 		return last_step
 
 	def _get_experiment(self,experiment_id):
@@ -120,6 +118,6 @@ class JarvisBaseState(object):
 			experiment = self._ermrest.get_data(7,"experiment_data",query)
 			return experiment	
 		except Exception as exc:
-			self.logger.error(str(exc))
+			print(str(exc))
 			return {} 
 	

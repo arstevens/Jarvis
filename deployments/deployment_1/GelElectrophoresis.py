@@ -39,8 +39,9 @@ class GelElectrophoresis(object):
 	def experiment_start_intent(self):
 		self.data['start_date'] = str(time.asctime(time.localtime(time.time())))
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
-		self._reset_user_data()
+		print("putting in new data")
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
+		print("returing reply")
 		return "Hello "+self.user+" Which experiment are you going to start"
 
 	def experiment_selection_intent(self, experiment_name):
