@@ -235,8 +235,6 @@ class IntentState(JarvisBaseState):
 		elif self._intent == "ExperimentEndIntent":
 			print("end intent")
 			self._speech_output = self._experiment_handler.experiment_end_intent()
-		elif self._intent == "ExperimentOpenIntent":
-			self._speech_output = "Experiment {} has been loaded".format(self._experiment_id)
 
 		
 		print(self._speech_output)

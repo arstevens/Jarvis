@@ -190,53 +190,38 @@ class IntentState(JarvisBaseState):
 		if self._intent == "ExperimentLoadingSampleAssignmentIntent":
 			sample_type = self._get_slot_value("SampleType",self._request)
 			well_number = self._get_slot_value("WellNumber",self._request)
-			print("load sample assignment")
 			self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent(sample_type,well_number)	
 
 		elif self._intent == "ExperimentSelectionIntent":
-			print("selection intent")
 			experiment_name = self._get_slot_value("ExperimentName",self._request)
 			self._speech_output = self._experiment_handler.experiment_selection_intent(experiment_name)
 
 		elif self._intent == "ExperimentGelSelectionIntent":
 			gel_type = self._get_slot_value("GelName",self._request)
-			print("gel selection")
 			self._speech_output = self._experiment_handler.experiment_gel_selection_intent(gel_type)
 	
 		elif self._intent == "ExperimentLoadingWellCountIntent":
-			print("loading well count")
 			well_count = self._get_slot_value("WellCount",self._request)
 			self._speech_output = self._experiment_handler.experiment_loading_well_count_intent(well_count)
 		
 		elif self._intent == "ExperimentStartIntent":
-			print("start intent")
 			self._speech_output = self._experiment_handler.experiment_start_intent()
 		elif self._intent == "ExperimentGelMixtureStartIntent":
-			print("gel mixture start")
 			self._speech_output = self._experiment_handler.experiment_gel_mixture_start_intent()
 		elif self._intent == "ExperimentGelMixtureEndIntent":
-			print("gel mixture end")
 			self._speech_output = self._experiment_handler.experiment_gel_mixture_end_intent()
 		elif self._intent == "ExperimentLoadingGelStartIntent":
-			print("experiment loading gel start")
 			self._speech_output = self._experiment_handler.experiment_loading_gel_start_intent()
 		elif self._intent == "ExperimentLoadingGelDoneIntent":
-			print("gel loading done")
 			self._speech_output = self._experiment_handler.experiment_gel_loading_done_intent()
 		elif self._intent == "ExperimentPowerSupplyStartIntent":
-			print("power supply start")
 			self._speech_output = self._experiment_handler.experiment_power_supply_start_intent()
 		elif self._intent == "ExperimentPowerSupplyCheckIntent":
-			pritn("power supply check")
 			self._speech_output = self._experiment_handler.experiment_power_supply_check_intent()
 		elif self._intent == "ExperimentPowerSupplyEndIntent":
-			print("power_supply end")
 			self._speech_output = self._experiment_handler.experiment_power_supply_end_intent()
 		elif self._intent == "ExperimentEndIntent":
-			print("end intent")
 			self._speech_output = self._experiment_handler.experiment_end_intent()
-		elif self._intent == "ExperimentOpenIntent":
-			self._speech_output = "Experiment {} has been loaded".format(self._experiment_id)
 
 		
 		print(self._speech_output)
@@ -262,6 +247,7 @@ class IntentState(JarvisBaseState):
 			eid = ermrest.get_data(7,"session_info")[0]['current_experiment_id']
 		return eid
 		
+	
 #===================================BuildResponse==============================================
 class ReturnState(JarvisBaseState):
 
