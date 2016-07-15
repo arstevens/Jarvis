@@ -227,7 +227,7 @@ class IntentState(JarvisBaseState):
 			print("power supply start")
 			self._speech_output = self._experiment_handler.experiment_power_supply_start_intent()
 		elif self._intent == "ExperimentPowerSupplyCheckIntent":
-			print("power supply check")
+			pritn("power supply check")
 			self._speech_output = self._experiment_handler.experiment_power_supply_check_intent()
 		elif self._intent == "ExperimentPowerSupplyEndIntent":
 			print("power_supply end")
