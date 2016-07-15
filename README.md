@@ -1,4 +1,4 @@
-<h2>Jarvis lab assistant: Alexa/Amazon Echo Skill.</h2>
+# Jarvis lab assistant: Alexa/Amazon Echo Skill
 
 ## Introduction
 Jarvis is your personal assistant in the lab. He will tell you the steps to an experiment and store data for you. All you have to do is tell him too! Jarvis is built using Python 2.7 and AWS Lambda.
