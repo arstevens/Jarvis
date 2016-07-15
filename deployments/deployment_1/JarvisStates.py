@@ -236,7 +236,7 @@ class IntentState(JarvisBaseState):
 			print("end intent")
 			self._speech_output = self._experiment_handler.experiment_end_intent()
 		elif self._intent == "ExperimentOpenIntent":
-			self._speech_output = "Experiment {} has been loaded".format(self._experiment_id)
+			self._speech_output = "Experiment {} has been loaded".format(str(self._experiment_id))
 
 		
 		print(self._speech_output)
@@ -274,11 +274,9 @@ class ReturnState(JarvisBaseState):
 	def handle_input(self):
 		#All this class does is return the response value. 
 		#Not needed just makes the state machine make more sense.	
-		try:
-			response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
-		except:
+		response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
+		if (response == None):
 			response = "Goodbye." #Logout clears all of the tables so this is the default.
-		print(response)
 		print("returning speech")
 		return str(response)
 
