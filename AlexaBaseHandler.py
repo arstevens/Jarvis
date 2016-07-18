@@ -142,43 +142,9 @@ class AlexaBaseHandler(object):
             'response': self._build_speechlet_response()
         }
 
-    def _get_intent(self, intent_request):
-        if 'intent' in intent_request:
-            return intent_request['intent']
-        else:
-            return None
-
-    def _get_intent_name(self, intent_request):
-        intent = self._get_intent(intent_request)
-        intent_name = None
-        if intent is not None and 'name' in intent:
-            intent_name = intent['name']
-
-        return intent_name
-
-    def _slot_exists(self, slot_name, intent_request):
-        intent = self._get_intent(intent_request)
-        if intent is not None:
-            return slot_name in intent['slots']
-        else:
-            return False
-
     @staticmethod
     def _get_session_attribute(session):
         if 'attributes' in session:
             return session['attributes']
         else:
             return dict()
-
-    def _get_slot_value(self, slot_name, intent_request):
-        value = None
-        try:
-            if self._slot_exists(slot_name, intent_request):
-                intent = self._get_intent(intent_request)
-                value = intent['slots'][slot_name]['value']
-            else:
-                value = None
-        except Exception as exc:
-            self.logger.error("Error getting slot value for slot_name={0}".format(slot_name))
-
-        return value

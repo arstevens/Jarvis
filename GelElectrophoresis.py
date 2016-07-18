@@ -47,7 +47,7 @@ class GelElectrophoresis(object):
 
 	def experiment_selection_intent(self, experiment_name):
 		#todo: check experiment_name is it allowed?
-		self.data['start_date'] = str(time.time())
+		self.data['start_date'] = str(time.asctime(time.localtime(time.time())))
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
 		self.data['experiment_id'] = int(self._experiment_id)
