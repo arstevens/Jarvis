@@ -10,6 +10,40 @@
 				]
 		},
 		{
+			"intent": "GetEIDIntent",
+			"slots":[]
+		},
+		{
+			"intent": "GetStartDateIntent",
+			"slots":[]
+		},
+		{
+			"intent": "GetEndDateIntent",
+			"slots":[]
+		},
+		{
+			"intent": "GetSampleCountIntent",
+			"slots":[]
+		},
+		{
+			"intent": "GetWellSampleAssignmentIntent",
+			"slots":[
+				{
+					"name": "WellNumber",
+					"type": "WELL_TYPE"
+				}
+				]
+		},
+		{
+			"intent": "GetSampleWellAssignmentIntent",
+			"slots":[
+				{
+					"name": "SampleType",
+					"type": "SAMPLE_TYPE"
+				}
+				]
+		},
+		{
 			"intent": "LogoutIntent",
 			"slots":[]
 		},

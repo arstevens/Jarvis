@@ -1,5 +1,11 @@
 LoginIntent Log in user {UserName}
 LogoutIntent Log me out 
+GetEIDIntent What is the ID of this experiment
+GetStartDateIntent When did i start this experiment
+GetEndDateIntent When did i finish this experiment
+GetSampleCountIntent How many samples did i experiment with
+GetWellSampleAssignmentIntent What sample was in well {WellNumber}
+GetSampleWellAssignmentIntent What well was assigned to sample {SampleType}
 ExperimentOpenIntent Open experiment number {EID}
 ExperimentStartIntent I am going to start an experiment
 ExperimentSelectionIntent I am starting {ExperimentName} and the id is {EID}
@@ -9,7 +15,9 @@ ExperimentGelMixtureEndIntent The mixture seems to be ready
 ExperimentGelMixtureEndIntent The gel is mixed and is ready to be used
 ExperimentLoadingGelStartIntent I am going to load samples in the well
 ExperimentLoadingWellCountIntent There are {WellCount} samples
+ExperimentLoadingWellCountIntent {WellCount} samples
 ExperimentLoadingSampleAssignmentIntent Assign sample {SampleType} to well {WellNumber}
+ExperimentLoadingSampleAssignmentIntent Sample {SampleType} is assigned to well {WellNumber}
 ExperimentLoadingGelDoneIntent I have loaded the gel in the electrophoresis chamber
 ExperimentPowerSupplyStartIntent I have started the power supply
 ExperimentPowerSupplyCheckIntent Can I turn off the power supply

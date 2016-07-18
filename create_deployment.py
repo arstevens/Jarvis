@@ -24,7 +24,7 @@ root_deployments_dir = "./deployments"
 deployment_files = ['AlexaBaseHandler.py', 'AlexaJarvisHandler.py',
                     'GelElectrophoresis.py', 'ErmrestHandler.py', 
 		    'JarvisBaseState.py','JarvisStateHandler.py',
-		    'JarvisStates.py','main.py']
+		    'JarvisStates.py','DataRetrieval.py','main.py']
 
 
 def _read_requirements():

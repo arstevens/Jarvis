@@ -2,6 +2,8 @@
 from JarvisBaseState import JarvisBaseState
 from ErmrestHandler import ErmrestHandler
 from GelElectrophoresis import GelElectrophoresis
+from DataRetrieval import DataRetrieval
+import re
 #===================================Authenticate==============================================
 class AuthenticateState(JarvisBaseState):
 	
@@ -12,6 +14,7 @@ class AuthenticateState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
+		print("initiated authenticate")
 		
 	def handle_input(self):
 		print("in authenticate")
@@ -30,6 +33,7 @@ class GetIntentState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
+		print("initiated getintent")
 	
 	def handle_input(self):
 		print("In GetIntentState")
@@ -55,6 +59,7 @@ class GetExperimentState(JarvisBaseState):
 		self._session = session
 		self._ermrest = ermrest
 		self._experiment_id = self._get_experiment_slot_id(self._request)
+		print('initiated get experiment')
 
 	def handle_input(self):
 		print("In get experiment state")
@@ -79,6 +84,7 @@ class LoginState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
+		print("initiated login")
 	
 	def handle_input(self):
 		print("in login")
@@ -108,6 +114,7 @@ class LogoutState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
+		print("initiated logout")
 	
 	def handle_input(self):
 		print("in logout state")
@@ -135,7 +142,10 @@ class ValidateState(JarvisBaseState):
 					'gel-loading-end':["ExperimentPowerSupplyStartIntent"],
 					'power-start':["ExperimentPowerSupplyEndIntent","ExperimentPowerSupplyCheckIntent"],
 					'power-end':["ExperimentEndIntent"],
-					'exp-end':[""]}
+					'exp-end':["GetEIDIntent","GetStartDateIntent","GetEndDateIntent",
+						"GetSampleCountIntent","GetWellSampleAssignmentIntent",
+						"GetSampleWellAssignmentIntent"]}
+		print("initiated validate")
 
 	def handle_input(self):
 		print("in validate state")
@@ -184,54 +194,76 @@ class IntentState(JarvisBaseState):
 		self._intent = self._get_intent_name(request)
 		self._experiment_id = self._get_experiment_id(self._request,self._ermrest)
 		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest)
+		self._data_retriever = DataRetrieval(self._ermrest,self._experiment_id,self._user)
+		print("initiated intent")
+				
 	
 	def handle_input(self):
 		print("in IntentState")
 
-		if self._intent == "ExperimentLoadingSampleAssignmentIntent":
-			sample_type = self._get_slot_value("SampleType",self._request)
-			well_number = self._get_slot_value("WellNumber",self._request)
-			self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent(sample_type,well_number)	
-		elif self._intent == "ExperimentSelectionIntent":
-			experiment_name = self._get_slot_value("ExperimentName",self._request)
-			self._speech_output = self._experiment_handler.experiment_selection_intent(experiment_name)
-		elif self._intent == "ExperimentGelSelectionIntent":
-			gel_type = self._get_slot_value("GelName",self._request)
-			self._speech_output = self._experiment_handler.experiment_gel_selection_intent(gel_type)
-		elif self._intent == "ExperimentLoadingWellCountIntent":
-			well_count = self._get_slot_value("WellCount",self._request)
-			self._speech_output = self._experiment_handler.experiment_loading_well_count_intent(well_count)
+		if (re.search("Experiment",self._intent)):
+			#if the request is an experiment request, run these
+			if self._intent == "ExperimentLoadingSampleAssignmentIntent":
+				sample_type = self._get_slot_value("SampleType",self._request)
+				well_number = self._get_slot_value("WellNumber",self._request)
+				self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent(sample_type,well_number)	
+			elif self._intent == "ExperimentSelectionIntent":
+				experiment_name = self._get_slot_value("ExperimentName",self._request)
+				self._speech_output = self._experiment_handler.experiment_selection_intent(experiment_name)
+			elif self._intent == "ExperimentGelSelectionIntent":
+				gel_type = self._get_slot_value("GelName",self._request)
+				self._speech_output = self._experiment_handler.experiment_gel_selection_intent(gel_type)
+			elif self._intent == "ExperimentLoadingWellCountIntent":
+				well_count = self._get_slot_value("WellCount",self._request)
+				self._speech_output = self._experiment_handler.experiment_loading_well_count_intent(well_count)
 		
-		elif self._intent == "ExperimentStartIntent":
-			self._speech_output = self._experiment_handler.experiment_start_intent()
-		elif self._intent == "ExperimentGelMixtureStartIntent":
-			self._speech_output = self._experiment_handler.experiment_gel_mixture_start_intent()
-		elif self._intent == "ExperimentGelMixtureEndIntent":
-			self._speech_output = self._experiment_handler.experiment_gel_mixture_end_intent()
-		elif self._intent == "ExperimentLoadingGelStartIntent":
-			self._speech_output = self._experiment_handler.experiment_loading_gel_start_intent()
-		elif self._intent == "ExperimentLoadingGelDoneIntent":
-			self._speech_output = self._experiment_handler.experiment_gel_loading_done_intent()
-		elif self._intent == "ExperimentPowerSupplyStartIntent":
-			self._speech_output = self._experiment_handler.experiment_power_supply_start_intent()
-		elif self._intent == "ExperimentPowerSupplyCheckIntent":
-			self._speech_output = self._experiment_handler.experiment_power_supply_check_intent()
-		elif self._intent == "ExperimentPowerSupplyEndIntent":
-			self._speech_output = self._experiment_handler.experiment_power_supply_end_intent()
-		elif self._intent == "ExperimentEndIntent":
-			self._speech_output = self._experiment_handler.experiment_end_intent()
-		elif self._intent == "ExperimentOpenIntent":
-			self._speech_output = "Experiment {} has been loaded".format(str(self._experiment_id))
+			elif self._intent == "ExperimentStartIntent":
+				self._speech_output = self._experiment_handler.experiment_start_intent()
+			elif self._intent == "ExperimentGelMixtureStartIntent":
+				self._speech_output = self._experiment_handler.experiment_gel_mixture_start_intent()
+			elif self._intent == "ExperimentGelMixtureEndIntent":
+				self._speech_output = self._experiment_handler.experiment_gel_mixture_end_intent()
+			elif self._intent == "ExperimentLoadingGelStartIntent":
+				self._speech_output = self._experiment_handler.experiment_loading_gel_start_intent()
+			elif self._intent == "ExperimentLoadingGelDoneIntent":
+				self._speech_output = self._experiment_handler.experiment_gel_loading_done_intent()
+			elif self._intent == "ExperimentPowerSupplyStartIntent":
+				self._speech_output = self._experiment_handler.experiment_power_supply_start_intent()
+			elif self._intent == "ExperimentPowerSupplyCheckIntent":
+				self._speech_output = self._experiment_handler.experiment_power_supply_check_intent()
+			elif self._intent == "ExperimentPowerSupplyEndIntent":
+				self._speech_output = self._experiment_handler.experiment_power_supply_end_intent()
+			elif self._intent == "ExperimentEndIntent":
+				self._speech_output = self._experiment_handler.experiment_end_intent()
+			elif self._intent == "ExperimentOpenIntent":
+				self._speech_output = "Experiment {} has been loaded".format(str(self._experiment_id))
 
-		
+		else:
+			#if the request is a retrieve intent, run these
+			if self._intent == "GetEIDIntent":
+				self._speech_output = self._data_retriever.get_experiment_id_intent()
+			elif self._intent == "GetStartDateIntent":
+				self._speech_output = self._data_retriever.get_start_date_intent()
+			elif self._intent == "GetEndDateIntent":
+				self._speech_output = self._data_retriever.get_end_date_intent()
+			elif self._intent == "GetSampleCountIntent":
+				self._speech_output = self._data_retriever.get_sample_count_intent()
+			elif self._intent == "GetWellSampleAssignmentIntent":
+				well_number = self._get_slot_value("WellNumber",self._request)
+				self._speech_output = self._data_retriever.get_well_sample_assignment_intent(well_number)
+			elif self._intent == "GetSampleWellAssignmentIntent":
+				sample = self._get_slot_value("SampleType",self._request)
+				self._speech_output = self._data_retriever.get_sample_well_assignment_intent(sample)
+
+		#Set the output response for ReturnState and set the completed step
 		self._set_session_data("jarvis_response",self._speech_output)
-
 		if self._intent != "ExperimentStartIntent":
 			self._set_completed_step(self._get_last_step(self._experiment_id))
 
 		return "ReturnState"
 	
 	def _get_experiment_id(self,request,ermrest):
+		#gets the experiment ID from all possible sources. Returns None if no ID
 		if (self._intent == "ExperimentStartIntent"):
 			eid = None	
 
@@ -248,15 +280,15 @@ class IntentState(JarvisBaseState):
 #===================================BuildResponse==============================================
 class ReturnState(JarvisBaseState):
 
-	def __init__(self,request,session,ermrest):
+	def __init__(self,request,session,ermrest):	
+		#All this state does is return the response value. 
+		#Needed since other states must return the key for the next state.	
 		super(self.__class__,self).__init__()
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
 
 	def handle_input(self):
-		#All this state does is return the response value. 
-		#Needed since other states must return the key for the next state.	
 		response = self._ermrest.get_data(7,"session_info")[0]['jarvis_response']
 
 		if (response == None):
