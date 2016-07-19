@@ -6,6 +6,7 @@ GetEndDateIntent When did i finish this experiment
 GetSampleCountIntent How many samples did i experiment with
 GetWellSampleAssignmentIntent What sample was in well {WellNumber}
 GetSampleWellAssignmentIntent What well was assigned to sample {SampleType}
+ExperimentCloseIntent Close this experiment
 ExperimentOpenIntent Open experiment number {EID}
 ExperimentStartIntent I am going to start an experiment
 ExperimentSelectionIntent I am starting {ExperimentName} and the id is {EID}

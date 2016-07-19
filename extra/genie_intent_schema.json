@@ -57,6 +57,10 @@
 				]
 		},
 		{
+			"intent": "ExperimentCloseIntent",
+			"slots":[]
+		},
+		{
 			"intent": "ExperimentStartIntent",
 			"slots": []
 		},

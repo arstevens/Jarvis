@@ -34,6 +34,16 @@ class GelElectrophoresis(object):
 
 		return ','.join(data)
 		
+	def item_exists(self,data,item):
+		if data is None or len(data) == 0:
+			return False
+		
+		data_list = data.split(',')
+
+		if item in data_list:
+			return True
+		return False
+
 	def reset_user_data(self):
 		#resets the experiment data so their are no duplicate lists
 		try:
@@ -88,18 +98,39 @@ class GelElectrophoresis(object):
 		return "Go ahead and allocate the samples in to individual wells"
 
 	def experiment_loading_sample_assignment_intent(self, sample_type, well_number):
-		#todo: make num to text so that it can tell what well a sample is in
-		self.data['samples'] = self.add_item(self.data['samples'], sample_type) 
-		self.data['well_numbers'] = self.add_item(self.data['well_numbers'], str(well_number))
-		self.reset_user_data()
-		self._ermrest.put_data(self._catalog,self._table_name,self.data)
-		return "Copy that. Sample {} has been assigned to well {}".format(sample_type,num2words(int(well_number)))
+		#checks if the well or sample is already assigned
+		if (self.item_exists(self.data['samples'],sample_type) == False and 
+			self.item_exists(self.data['well_numbers'],str(well_number)) == False):
+			print("evaluated true")
+
+			self.data['samples'] = self.add_item(self.data['samples'], sample_type) 
+			print("assigned samples")
+			self.data['well_numbers'] = self.add_item(self.data['well_numbers'], str(well_number))
+			print("assinged well numbers")
+			self.reset_user_data()
+			print("reset")
+			self._ermrest.put_data(self._catalog,self._table_name,self.data)
+			print("put data")
+			return "Copy that. Sample {} has been assigned to well {}".format(sample_type,num2words(int(well_number)))
+		print("evaluated false")
+
+		return "The well or sample you provided me is already in use. Please choose a different one"
 
 	def experiment_gel_loading_done_intent(self):
-		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-end')
-		self.reset_user_data()
-		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Go ahead and turn on the power supply"
+		print("in gel loading intent")
+		amount_of_samples_used = len(self.data['samples'].split(","))
+		print("samples used: "+str(amount_of_samples_used))
+		amount_of_samples_left = num2words(self.data['sample_count']-amount_of_samples_used)
+		print("samples left:"+amount_of_samples_left)
+		#checks if you have any unassigned samples
+		if (amount_of_samples_used == self.data['sample_count']):
+			print("in equals")
+			self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-end')
+			self.reset_user_data()
+			self._ermrest.put_data(self._catalog, self._table_name, self.data)
+			return "Go ahead and turn on the power supply"
+		print("not finished")
+		return "You are yet to assign {} samples to wells. Please finish assigning the samples".format(amount_of_samples_left)
 
 	def experiment_power_supply_start_intent(self):
     		self.data['power_supply_start_time'] = str(int(time.time()))
@@ -119,8 +150,13 @@ class GelElectrophoresis(object):
 		self.data['power_supply_end_time'] = str(int(time.time()))
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'power-end')
 		self.reset_user_data()
-		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Roger that, Don't forget to record your findings"
+		self._ermrest.put_data(self._catalog, self._table_name, self.data)		
+		time_spent = int(time.time()) - int(self.data['power_supply_start_time'])
+
+		if time_spent > 60:
+			return "Roger that, Don't forget to record your findings"
+
+		return "You turned the power supply off too early"
 
 	def experiment_end_intent(self):
 		self.data['end_date'] = str(time.asctime(time.localtime(time.time())))
@@ -128,5 +164,3 @@ class GelElectrophoresis(object):
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
 		return self.user+", your experiment is completed."
-
-	#Need to implement the help intents and create a seperate help center class
