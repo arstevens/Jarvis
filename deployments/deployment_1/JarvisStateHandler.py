@@ -4,14 +4,13 @@ from JarvisStates import *
 class JarvisStateHandler(object):
 
 	def __init__(self,request,session,ermrest):
-		print("made request")
 		self._request = request
-		print("session")
 		self._session = session
 		self._ermrest = ermrest
 		self._return_value = None 
-		print("making states")
 		try:
+			#States all return the name of the next state, except for ReturnState.
+			#ReturnState returns the alexa response to be build and said to the user.	
 			self._states = {"AuthenticateState":AuthenticateState(self._request,self._session,self._ermrest),
 				"GetIntentState":GetIntentState(self._request,self._session,self._ermrest),
 				"GetExperimentState":GetExperimentState(self._request,self._session,self._ermrest),
@@ -22,12 +21,11 @@ class JarvisStateHandler(object):
 				"ReturnState":ReturnState(self._request,self._session,self._ermrest)}
 		except Exception as exc:
 			print("State Creation Error: "+str(exc))
-		print("made states")
 		self.current_state = self._states["AuthenticateState"]
-		print("made current state")
 	
-	def handle_states(self):
-		print("in jarvis state handler")
+	def run_states(self):
+		print("started_run")
+		#runs the state machine and handles state switching.
 		while (True):
 			new_state = self.current_state.handle_input()
 			if (new_state not in self._states): #checks to see if what was returned could be the alexa response value

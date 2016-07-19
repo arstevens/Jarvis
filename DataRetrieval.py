@@ -13,25 +13,25 @@ class DataRetrieval(object):
 	
 	def get_experiment_id_intent(self):
 		#returns the response for the GetExperimentIdIntent
-		return "The experiment ID of the experiment your working on is "+num2words(int(self._experiment_id))
+		return "The ID is, "+num2words(int(self._experiment_id))
 	
 	def get_start_date_intent(self):
 		#gets the start date of the experiment and constructs response
 		start_date = self._get_experiment_data("start_date")
 		speakable_time = self._epoch_to_time(start_date)
-		return "You started this experiment on "+speakable_time
+		return "You started this experiment on, "+speakable_time
 	
 	def get_end_date_intent(self):
 		#gets the end date of the experiment and constructs response
 		end_date = self._get_experiment_data("end_date")
 		speakable_time = self._epoch_to_time(end_date)
-		return "You ended this experiment on "+speakable_time
+		return "You ended this experiment on, "+speakable_time
 	
 	def get_sample_count_intent(self):
 		#gets the amount of samples experimented with and constructs response
 		sample_count = self._get_experiment_data("sample_count")
 		speakable_count = num2words(int(sample_count))
-		return "You experimented with "+speakable_count+" samples"
+		return "You experimented with, "+speakable_count+", samples"
 	
 	def get_well_sample_assignment_intent(self,well_number):
 		#gets the sample that was assigned to the well number given and constructs a response
@@ -40,7 +40,7 @@ class DataRetrieval(object):
 		well_index = well_numbers.find(str(well_number))
 		assigned_sample = samples[well_index]
 		speakable_well = num2words(int(well_number))
-		return "Well number "+speakable_well+" is assigned to sample "+assigned_sample
+		return "Well number, "+speakable_well+", is assigned to sample, "+assigned_sample
 	
 	def get_sample_well_assignment_intent(self,sample):
 		#gets well assigned to sample that was provided and constructs response
@@ -48,7 +48,7 @@ class DataRetrieval(object):
 		samples = self._get_experiment_data("samples")
 		sample_index = samples.find(sample)
 		assigned_well = num2words(int(well_numbers[sample_index]))
-		return "Sample "+sample+" was assigned to well number "+assigned_well
+		return "Sample, "+sample+", was assigned to well number, "+assigned_well
 	
 	def _get_experiment_data(self,column):
 		#gets data from the experiment_data table 
@@ -109,10 +109,10 @@ class DataRetrieval(object):
 			new_date += "December "
 
 		#Adds day to new_date
-		new_date += num2words(int(time_date[2]))+" "
+		new_date += num2words(int(time_date[2]))+", "
 		
 		#Adds year to new_date
-		new_date += num2words(int(time_date[4]))+" "
+		new_date += num2words(int(time_date[4]))+", "
 		
 		#Adds time to new_date
 		date_time = time_date[3].split(":")

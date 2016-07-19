@@ -1,10 +1,13 @@
 from ErmrestHandler import ErmrestHandler
+from num2words import num2words
 import json
 import time
 
 class GelElectrophoresis(object):
 
 	def __init__(self,username,experiment_id,ermrest_handler):
+		#Contains all the methods to run for experiment intents.
+		#Returns the text response and writes data to ermrest.
 		self.user = username
 		self._ermrest = ermrest_handler
 		self._table_name = "experiment_data"
@@ -18,10 +21,11 @@ class GelElectrophoresis(object):
 			self.data = {"experiment_id":experiment_id,"user":self.user,"experiment":None,
 					"start_date":None,"end_date":None,"states_completed":None,
 					"gel_type":None,"sample_count":None,"power_supply_start_time":None,
-					"power_supply_end_time":None}
+					"power_supply_end_time":None,"samples":None,"well_numbers":None}
 
 	def add_item(self, data, item):
 		#adds item to a string based list that is held in ermrest.
+		#Lists that use add_item: states_completed,samples,well_numbers
 		if data is None or len(data) == 0:
 			data = [item]
 		else:
@@ -31,6 +35,7 @@ class GelElectrophoresis(object):
 		return ','.join(data)
 		
 	def reset_user_data(self):
+		#resets the experiment data so their are no duplicate lists
 		try:
 			self._ermrest.delete_data(self._catalog,self._table_name,"/user="+self.user+
 							"/experiment_id="+str(self._experiment_id))
@@ -42,7 +47,7 @@ class GelElectrophoresis(object):
 
 	def experiment_selection_intent(self, experiment_name):
 		#todo: check experiment_name is it allowed?
-		self.data['start_date'] = str(time.time())
+		self.data['start_date'] = str(time.asctime(time.localtime(time.time())))
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
 		self.data['experiment_id'] = int(self._experiment_id)
@@ -55,7 +60,7 @@ class GelElectrophoresis(object):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-selection')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Alright "+self.user+" Go ahead and prepare your "+gel_type+" based gel"
+		return "Alright "+self.user+", Go ahead and prepare your "+gel_type+" based gel"
 
 	def experiment_gel_mixture_start_intent(self):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-start')
@@ -67,20 +72,20 @@ class GelElectrophoresis(object):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'mixture-end')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Alright "+self.user+", cool it for some time and then load the samples in the wells"
+		return "Alright "+self.user+", cool it for some time and then load the samples in to the wells"
 
 	def experiment_loading_gel_start_intent(self):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-start')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "How many samples you are going to experiment with"
+		return "How many samples are you going to experiment with"
 
 	def experiment_loading_well_count_intent(self, count):
 		self.data['sample_count'] = count
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'sample-count')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Go ahead and allocate the samples to individual wells"
+		return "Go ahead and allocate the samples in to individual wells"
 
 	def experiment_loading_sample_assignment_intent(self, sample_type, well_number):
 		#todo: make num to text so that it can tell what well a sample is in
@@ -88,7 +93,7 @@ class GelElectrophoresis(object):
 		self.data['well_numbers'] = self.add_item(self.data['well_numbers'], str(well_number))
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog,self._table_name,self.data)
-		return "Copy that."
+		return "Copy that. Sample {} has been assigned to well {}".format(sample_type,num2words(int(well_number)))
 
 	def experiment_gel_loading_done_intent(self):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-end')
@@ -106,7 +111,7 @@ class GelElectrophoresis(object):
 	def experiment_power_supply_check_intent(self):
 		time_spend = int(time.time()) - int(self.data['power_supply_start_time'])
 		if time_spend < 60:
-			return 'No, you need to wait ' + str(60 - time_spend) +' more seconds'
+			return 'No, you need to wait ' + str(num2words(60 - time_spend)) +' more seconds'
 		else:
 			return "Yes you can"
 
@@ -115,7 +120,7 @@ class GelElectrophoresis(object):
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'power-end')
 		self.reset_user_data()
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		return "Roger that"
+		return "Roger that, Don't forget to record your findings"
 
 	def experiment_end_intent(self):
 		self.data['end_date'] = str(time.asctime(time.localtime(time.time())))

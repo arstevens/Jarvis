@@ -18,18 +18,13 @@ class AlexaJarvisHandler(AlexaBaseHandler):
 
 	def on_processing_error(self, event, context, exc):
 		self.logger.error("on_processing_error")
-		try:
-			self._ermrest.delete_data(7,"session_info")
-			self._ermrest.put_data(7,"session_info",{"user":None,"jarvis_response":None})
-		except:
-			pass
 		self._speech_output = "Jarvis experienced problems. Please check logs"
 		return self._build_response(dict())
 
 	def on_launch(self, request, session):
 		self.logger.info("on_launch")
 		session_attributes = self._get_session_attribute(session)
-		self._speech_output = "Hello, I am Jarvis your lab partner."
+		self._speech_output = "Hello, I am Jarvis your personal assistant and lab partner."
 		return self._build_response(session_attributes)
 
 	def on_session_started(self, request, session):
@@ -37,13 +32,12 @@ class AlexaJarvisHandler(AlexaBaseHandler):
 		return self.on_launch(request, session)
 
 	def on_intent(self, request, session):
+		#runs state machine to handle intents and store data
+		#in the ermrest relational database.
 		self.logger.info("on_intent")
 		session_attributes = self._get_session_attribute(session)
-		print("made attribute")
 		jarvis_state_handler = JarvisStateHandler(request,session,self._ermrest)
-		print("Made state handler")
-		self._speech_output = jarvis_state_handler.handle_states()
-		print("created speech output:"+self._speech_output)
+		self._speech_output = jarvis_state_handler.run_states()
 		return self._build_response(session_attributes) 
 
 	def on_session_ended(self, request, session):
