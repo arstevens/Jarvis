@@ -8,7 +8,7 @@ class GelElectrophoresis(object):
 	def __init__(self,username,experiment_id,ermrest_handler):
 		#Contains all the methods to run for experiment intents.
 		#Returns the text response and writes data to ermrest.
-		self.user = username
+		self.user = username.lower()
 		self._ermrest = ermrest_handler
 		self._table_name = "experiment_data"
 		self._catalog = 7
