@@ -180,6 +180,11 @@ class ValidateState(JarvisBaseState):
 		if intent_name in valid_intents:
 			return "IntentState"
 
+		elif intent_name == "LoginIntent":
+			self._speech_output = "A user is already logged in. Please log that user out before proceding"
+			self._set_session_data("jarvis_response",self._speech_output)
+			return "ReturnState"
+
 		else:
 			self._speech_output = "Your input was invalid. If not, check the logs"
 			self._set_session_data("jarvis_response",self._speech_output)
