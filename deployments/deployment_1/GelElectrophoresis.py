@@ -8,7 +8,10 @@ class GelElectrophoresis(object):
 	def __init__(self,username,experiment_id,ermrest_handler):
 		#Contains all the methods to run for experiment intents.
 		#Returns the text response and writes data to ermrest.
-		self.user = username
+		if username != None:
+			self.user = username.lower()
+		else:
+			self.user = username
 		self._ermrest = ermrest_handler
 		self._table_name = "experiment_data"
 		self._catalog = 7
@@ -35,6 +38,8 @@ class GelElectrophoresis(object):
 		return ','.join(data)
 		
 	def item_exists(self,data,item):
+		#Checks if item exists in a string with items seperated by commas
+		#Lists that can use this: well_numbers,samples,states_completed
 		if data is None or len(data) == 0:
 			return False
 		
@@ -52,11 +57,12 @@ class GelElectrophoresis(object):
 		except Exception as exc:
 			print("reset user data error:"+str(exc))
 
+	#Specific methods for each Experiment intent
+	#Must return jarvis response
 	def experiment_start_intent(self):
 		return "Hello "+self.user+" Which experiment are you going to start"
 
 	def experiment_selection_intent(self, experiment_name):
-		#todo: check experiment_name is it allowed?
 		self.data['start_date'] = str(time.asctime(time.localtime(time.time())))
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
@@ -98,38 +104,43 @@ class GelElectrophoresis(object):
 		return "Go ahead and allocate the samples in to individual wells"
 
 	def experiment_loading_sample_assignment_intent(self, sample_type, well_number):
-		#checks if the well or sample is already assigned
-		if (self.item_exists(self.data['samples'],sample_type) == False and 
+		#sets default values so the first if statement isn't invoked if list is empty
+		amount_of_samples_used = 0
+		sample_count = 9999
+		#if list isn't empty. gets the proper values
+		if (self.data['samples']):
+			amount_of_samples_used = len(self.data['samples'].split(","))
+			sample_count = int(self.data['sample_count'])
+	
+		#checks if you have already loaded all the samples or not
+		#if yes, returns response saying you have already loaded all samples
+		if (amount_of_samples_used >= sample_count):
+			print("too big!")
+			return "You have already loaded all the samples. Please continue the experiment."
+
+		#Checks to see if the provided sample or well number have already been loaded
+		elif (self.item_exists(self.data['samples'],sample_type) == False and 
 			self.item_exists(self.data['well_numbers'],str(well_number)) == False):
-			print("evaluated true")
 
 			self.data['samples'] = self.add_item(self.data['samples'], sample_type) 
-			print("assigned samples")
 			self.data['well_numbers'] = self.add_item(self.data['well_numbers'], str(well_number))
-			print("assinged well numbers")
 			self.reset_user_data()
-			print("reset")
 			self._ermrest.put_data(self._catalog,self._table_name,self.data)
-			print("put data")
 			return "Copy that. Sample {} has been assigned to well {}".format(sample_type,num2words(int(well_number)))
-		print("evaluated false")
-
-		return "The well or sample you provided me is already in use. Please choose a different one"
+		
+		#Invoked if the well or sample has already been loaded but you tried to load it again
+		else:
+			return "The well or sample you provided me is already in use. Please choose a different one"
 
 	def experiment_gel_loading_done_intent(self):
-		print("in gel loading intent")
 		amount_of_samples_used = len(self.data['samples'].split(","))
-		print("samples used: "+str(amount_of_samples_used))
 		amount_of_samples_left = num2words(self.data['sample_count']-amount_of_samples_used)
-		print("samples left:"+amount_of_samples_left)
 		#checks if you have any unassigned samples
 		if (amount_of_samples_used == self.data['sample_count']):
-			print("in equals")
 			self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-end')
 			self.reset_user_data()
 			self._ermrest.put_data(self._catalog, self._table_name, self.data)
 			return "Go ahead and turn on the power supply"
-		print("not finished")
 		return "You are yet to assign {} samples to wells. Please finish assigning the samples".format(amount_of_samples_left)
 
 	def experiment_power_supply_start_intent(self):

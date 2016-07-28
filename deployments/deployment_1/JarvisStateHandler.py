@@ -13,7 +13,7 @@ class JarvisStateHandler(object):
 			#ReturnState returns the alexa response to be build and said to the user.	
 			self._states = {"AuthenticateState":AuthenticateState(self._request,self._session,self._ermrest),
 				"GetIntentState":GetIntentState(self._request,self._session,self._ermrest),
-				"GetExperimentState":GetExperimentState(self._request,self._session,self._ermrest),
+				"ExperimentOpenCloseState":ExperimentOpenCloseState(self._request,self._session,self._ermrest),
 				"LoginState":LoginState(self._request,self._session,self._ermrest),
 				"LogoutState":LogoutState(self._request,self._session,self._ermrest),
 				"ValidateState":ValidateState(self._request,self._session,self._ermrest),

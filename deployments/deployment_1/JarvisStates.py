@@ -33,7 +33,9 @@ class GetIntentState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
+		self._open_close_states = ['ExperimentOpenIntent','ExperimentCloseIntent']
 		print("initiated getintent")
+
 	
 	def handle_input(self):
 		print("In GetIntentState")
@@ -41,15 +43,15 @@ class GetIntentState(JarvisBaseState):
 
 		if intent_name == "LogoutIntent":
 			return "LogoutState"
-		
-		elif intent_name == "ExperimentOpenIntent":
-			return "GetExperimentState"
-		
+
+		elif intent_name in self._open_close_states: 
+			return "ExperimentOpenCloseState"
+
 		else:
 			return "ValidateState"
 	
 #===================================GetExperiment==============================================
-class GetExperimentState(JarvisBaseState):
+class ExperimentOpenCloseState(JarvisBaseState):
 	
 	def __init__(self,request,session,ermrest):
 		#Loads an unfinished experiment if the user wishes to.
@@ -58,11 +60,19 @@ class GetExperimentState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
+		self._intent = self._get_intent_name(self._request)
 		self._experiment_id = self._get_experiment_slot_id(self._request)
 		print('initiated get experiment')
 
 	def handle_input(self):
-		print("In get experiment state")
+		if self._intent == "ExperimentOpenIntent":
+			return_value = self._experiment_open()
+		else:
+			return_value = self._experiment_close()
+
+		return return_value
+	
+	def _experiment_open(self):
 		completed_step = self._get_last_step(self._experiment_id)
 		success = self._set_completed_step(completed_step)
 		if (success):
@@ -72,6 +82,13 @@ class GetExperimentState(JarvisBaseState):
 			self._speech_output = "The experiment you wish to open does not exist." 
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
+	
+	def _experiment_close(self):
+		self._clear("step_completed")
+		self._set_session_data("current_experiment_id",None)
+		self._speech_output = "Experiment closed. Please load an old experiment or start a new one."
+		self._set_session_data("jarvis_response",self._speech_output)
+		return "ReturnState"
 	
 #===================================Login==============================================
 class LoginState(JarvisBaseState):
@@ -89,20 +106,26 @@ class LoginState(JarvisBaseState):
 	def handle_input(self):
 		print("in login")
 		username = self._get_username("UserName")
+		print('got username')
 		if (username):
+			print('in username')
 			self._speech_output = "Hello {}. Your session has begun".format(username)
 			self._set_session_data("jarvis_response",self._speech_output)
 			self._set_session_data("user",username)
 			return "ReturnState"
 		else:
+			print("in no username")
 			self._speech_output = "No user is logged in at the moment. Please provide your username and your session will begin."
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
 	
 	def _get_username(self,slot_name):
-		if (self._slot_exists(slot_name,self._request)):
-			return self._get_slot_value(slot_name,self._request)
-		else:
+		try:
+			if (self._slot_exists(slot_name,self._request)):
+				return self._get_slot_value(slot_name,self._request)
+			else:
+				return None
+		except:
 			return None
 
 #===================================Logout==============================================
@@ -163,6 +186,17 @@ class ValidateState(JarvisBaseState):
 		if intent_name in valid_intents:
 			return "IntentState"
 
+		elif intent_name == "LoginIntent":
+			self._speech_output = "A user is already logged in. Please log that user out before proceding"
+			self._set_session_data("jarvis_response",self._speech_output)
+			return "ReturnState"
+
+		elif intent_name == "GetUserNameIntent":
+			current_user = self._get_current_user()
+			self._speech_output = "The current user is, {}".format(current_user)
+			self._set_session_data("jarvis_response",self._speech_output)
+			return "ReturnState"
+
 		else:
 			self._speech_output = "Your input was invalid. If not, check the logs"
 			self._set_session_data("jarvis_response",self._speech_output)
@@ -190,7 +224,10 @@ class IntentState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
-		self._user = self._ermrest.get_data(7,"session_info")[0]["user"]
+		try:
+			self._user = self._ermrest.get_data(7,"session_info")[0]["user"]
+		except:
+			self._user = None
 		self._intent = self._get_intent_name(request)
 		self._experiment_id = self._get_experiment_id(self._request,self._ermrest)
 		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest)
@@ -294,5 +331,5 @@ class ReturnState(JarvisBaseState):
 		if (response == None):
 			response = "Goodbye." #Logout clears all of the tables so this is the default.
 
-		return str(response)
+		return response
 

@@ -59,7 +59,10 @@ class JarvisBaseState(object):
         	return value
 	
 	def _get_current_user(self):
-		current_user = self._ermrest.get_data(7,"session_info","")[0]
+		try:
+			current_user = self._ermrest.get_data(7,"session_info")[0]
+		except:
+			current_user = {"user":None}
 		return current_user['user']
 	
 	def _set_session_data(self,column,new_data):
