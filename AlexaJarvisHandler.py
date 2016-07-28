@@ -22,9 +22,15 @@ class AlexaJarvisHandler(AlexaBaseHandler):
 		return self._build_response(dict())
 
 	def on_launch(self, request, session):
+		self._speech_output = "Hello, I am Jarvis your personal assistant and lab partner."
+		try:
+			current_user = self._ermrest.get_data(7,"session_info")[0]['user']
+			if (current_user != None):
+				self._speech_output = "Hello {}, How may i help you".format(current_user)
+		except:
+			pass
 		self.logger.info("on_launch")
 		session_attributes = self._get_session_attribute(session)
-		self._speech_output = "Hello, I am Jarvis your personal assistant and lab partner."
 		return self._build_response(session_attributes)
 
 	def on_session_started(self, request, session):

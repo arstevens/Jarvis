@@ -43,7 +43,7 @@ class GetIntentState(JarvisBaseState):
 
 		if intent_name == "LogoutIntent":
 			return "LogoutState"
-		
+
 		elif intent_name in self._open_close_states: 
 			return "ExperimentOpenCloseState"
 
@@ -106,20 +106,26 @@ class LoginState(JarvisBaseState):
 	def handle_input(self):
 		print("in login")
 		username = self._get_username("UserName")
+		print('got username')
 		if (username):
+			print('in username')
 			self._speech_output = "Hello {}. Your session has begun".format(username)
 			self._set_session_data("jarvis_response",self._speech_output)
 			self._set_session_data("user",username)
 			return "ReturnState"
 		else:
+			print("in no username")
 			self._speech_output = "No user is logged in at the moment. Please provide your username and your session will begin."
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
 	
 	def _get_username(self,slot_name):
-		if (self._slot_exists(slot_name,self._request)):
-			return self._get_slot_value(slot_name,self._request)
-		else:
+		try:
+			if (self._slot_exists(slot_name,self._request)):
+				return self._get_slot_value(slot_name,self._request)
+			else:
+				return None
+		except:
 			return None
 
 #===================================Logout==============================================
@@ -185,6 +191,12 @@ class ValidateState(JarvisBaseState):
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
 
+		elif intent_name == "GetUserNameIntent":
+			current_user = self._get_current_user()
+			self._speech_output = "The current user is, {}".format(current_user)
+			self._set_session_data("jarvis_response",self._speech_output)
+			return "ReturnState"
+
 		else:
 			self._speech_output = "Your input was invalid. If not, check the logs"
 			self._set_session_data("jarvis_response",self._speech_output)
@@ -212,7 +224,10 @@ class IntentState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
-		self._user = self._ermrest.get_data(7,"session_info")[0]["user"]
+		try:
+			self._user = self._ermrest.get_data(7,"session_info")[0]["user"]
+		except:
+			self._user = None
 		self._intent = self._get_intent_name(request)
 		self._experiment_id = self._get_experiment_id(self._request,self._ermrest)
 		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest)

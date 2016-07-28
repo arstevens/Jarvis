@@ -1,5 +1,6 @@
 LoginIntent Log in user {UserName}
 LogoutIntent Log me out 
+GetUserNameIntent Who is the current user
 GetEIDIntent What is the ID of this experiment
 GetStartDateIntent When did i start this experiment
 GetEndDateIntent When did i finish this experiment
