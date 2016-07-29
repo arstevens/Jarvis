@@ -18,6 +18,7 @@ class GelElectrophoresis(object):
 		self._catalog = 7
 		self._experiment_id = experiment_id
 		try:
+			#grab previous experiment data if experiment is not new
 			self.data = json.loads(json.dumps(self._ermrest.get_data(7,self._table_name,"/user="+
 						self.user+"/experiment_id="+str(experiment_id))[0]))
 		except Exception as exc:
@@ -28,7 +29,7 @@ class GelElectrophoresis(object):
 					"power_supply_end_time":None,"samples":None,"well_numbers":None}
 
 	def add_item(self, data, item):
-		#adds item to a string based list that is held in ermrest.
+		#adds item to a list 
 		#Lists that use add_item: states_completed,samples,well_numbers
 		if data is None or len(data) == 0:
 			data = [item]
@@ -39,7 +40,7 @@ class GelElectrophoresis(object):
 		return ','.join(data)
 		
 	def item_exists(self,data,item):
-		#Checks if item exists in a string with items seperated by commas
+		#Checks if item exists 
 		#Lists that can use this: well_numbers,samples,states_completed
 		if data is None or len(data) == 0:
 			return False
@@ -64,6 +65,7 @@ class GelElectrophoresis(object):
 		return "Hello "+self.user+" Which experiment are you going to start"
 
 	def experiment_selection_intent(self, experiment_name):
+		#grabs time from los angeles.
 		l_time = requests.get("http://api.worldweatheronline.com/premium/v1/tz.ashx?key=9174f59cefa9423ca61203623162807&q=Los+Angeles&format=xml")
 		l_time = str((l_time.text.split("<localtime>")[1]).split("</localtime>")[0]).split(" ")[1]
 		local_time = list(time.localtime(time.time()))
@@ -71,19 +73,13 @@ class GelElectrophoresis(object):
 		local_time[3] = int(hour) 
 		local_time[4] = int(minute)
 		local_time = time.struct_time(local_time)
-		print("time finished")
+
 		self.data['start_date'] = time.asctime(local_time)
-		print("Time inputed")
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-start')
-		print("added first state")
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-selection')
-		print("added second state")
 		self.data['experiment_id'] = int(self._experiment_id)
-		print("added experiment id")
 		self.data['experiment'] = experiment_name
-		print("added experiment name")
 		self._ermrest.put_data(self._catalog, self._table_name, self.data)
-		print("put in ermrest")
 		return "Will it be a Polyacrylamide or Agarose based Gel"
 
 	def experiment_gel_selection_intent(self, gel_type):
@@ -141,7 +137,7 @@ class GelElectrophoresis(object):
 			self.data['well_numbers'] = self.add_item(self.data['well_numbers'], str(well_number))
 			self.reset_user_data()
 			self._ermrest.put_data(self._catalog,self._table_name,self.data)
-			return "Copy that. Sample {} has been assigned to well {}".format(sample_type,num2words(int(well_number)))
+			return "Copy that. Samples assigned"
 		
 		#Invoked if the well or sample has already been loaded but you tried to load it again
 		else:
@@ -150,6 +146,7 @@ class GelElectrophoresis(object):
 	def experiment_gel_loading_done_intent(self):
 		amount_of_samples_used = len(self.data['samples'].split(","))
 		amount_of_samples_left = num2words(self.data['sample_count']-amount_of_samples_used)
+
 		#checks if you have any unassigned samples
 		if (amount_of_samples_used == self.data['sample_count']):
 			self.data['states_completed'] = self.add_item(self.data['states_completed'], 'gel-loading-end')
@@ -166,6 +163,7 @@ class GelElectrophoresis(object):
 		return "You can turn off the supply in 1 minute from now"
 
 	def experiment_power_supply_check_intent(self):
+		#returns the time left until you can turn off power supply
 		time_spend = int(time.time()) - int(self.data['power_supply_start_time'])
 		if time_spend < 60:
 			return 'No, you need to wait ' + str(num2words(60 - time_spend)) +' more seconds'
@@ -185,6 +183,7 @@ class GelElectrophoresis(object):
 		return "You turned the power supply off too early"
 
 	def experiment_end_intent(self):
+		#gets Los Angeles time
 		l_time = requests.get("http://api.worldweatheronline.com/premium/v1/tz.ashx?key=9174f59cefa9423ca61203623162807&q=Los+Angeles&format=xml")
 		l_time = str((l_time.text.split("<localtime>")[1]).split("</localtime>")[0]).split(" ")[1]
 		local_time = list(time.localtime(time.time()))
@@ -192,6 +191,7 @@ class GelElectrophoresis(object):
 		local_time[3] = int(hour) 
 		local_time[4] = int(minute)
 		local_time = time.struct_time(local_time)
+
 		self.data['end_date'] = time.asctime(local_time)
 		self.data['states_completed'] = self.add_item(self.data['states_completed'], 'exp-end')
 		self.reset_user_data()

@@ -10,7 +10,7 @@ class JarvisStateHandler(object):
 		self._return_value = None 
 		try:
 			#States all return the name of the next state, except for ReturnState.
-			#ReturnState returns the alexa response to be build and said to the user.	
+			#ReturnState returns the alexa response to be built and said to the user.	
 			self._states = {"AuthenticateState":AuthenticateState(self._request,self._session,self._ermrest),
 				"GetIntentState":GetIntentState(self._request,self._session,self._ermrest),
 				"ExperimentOpenCloseState":ExperimentOpenCloseState(self._request,self._session,self._ermrest),
@@ -20,11 +20,11 @@ class JarvisStateHandler(object):
 				"IntentState":IntentState(self._request,self._session,self._ermrest),
 				"ReturnState":ReturnState(self._request,self._session,self._ermrest)}
 		except Exception as exc:
-			print("State Creation Error: "+str(exc))
+			print("[!] State Creation Error: "+str(exc))
+		#Always starts with AuthenticateState
 		self.current_state = self._states["AuthenticateState"]
 	
 	def run_states(self):
-		print("started_run")
 		#runs the state machine and handles state switching.
 		while (True):
 			new_state = self.current_state.handle_input()

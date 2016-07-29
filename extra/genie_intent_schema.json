@@ -129,6 +129,27 @@
 			]
 		},
 		{
+			"intent": "ExperimentLoadingSampleAssignmentMultiIntent",
+			"slots": [
+			{
+				"name": "SampleType",
+				"type": "SAMPLE_TYPE"
+			},
+			{
+				"name": "WellNumber",
+				"type": "WELL_TYPE"
+			},
+			{
+				"name": "SampleTypeTwo",
+				"type": "SAMPLE_TYPE"
+			},
+			{
+				"name": "WellNumberTwo",
+				"type": "WELL_TYPE"
+			}
+			]
+		},
+		{
 			"intent": "ExperimentLoadingGelDoneIntent",
 			"slots":[]
 		},

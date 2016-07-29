@@ -15,13 +15,11 @@ class JarvisBaseState(object):
 	
 	@abc.abstractmethod
 	def handle_input(self):
-		"""The handle_input method is the front end for your State.
-		It will be the method that is called by the main handler. All
-		other methods described in the child class should not be run solo 
-		and should only be called through this method or by other methods 
-		called by this method."""
+		"""The handle_input method will be the method called by the StateHandler. 
+			States must return the name of the state to switch too.
+			The only state which returns a value other than that is the ReturnState 
+			which returns the text for Alexa to say to the user.""" 
 		return
-
 ##=============================Helper Methods=============================================
 
 	def _get_intent(self, intent_request):
@@ -40,7 +38,7 @@ class JarvisBaseState(object):
 
 	def _slot_exists(self, slot_name, intent_request):
 		intent = self._get_intent(intent_request)
-		if intent is not None:
+		if intent:
 			return slot_name in intent['slots']
 		else:
 			return False
@@ -60,10 +58,10 @@ class JarvisBaseState(object):
 	
 	def _get_current_user(self):
 		try:
-			current_user = self._ermrest.get_data(7,"session_info")[0]
+			current_user = self._ermrest.get_data(7,"session_info")[0]['user']
 		except:
-			current_user = {"user":None}
-		return current_user['user']
+			current_user = None	
+		return current_user
 	
 	def _set_session_data(self,column,new_data):
 		current_data = self._ermrest.get_data(7,"session_info")[0]
@@ -77,35 +75,17 @@ class JarvisBaseState(object):
 			return False
 
 	def _set_completed_step(self,new_step):
-		print("in set completed step")
 		try:
 			data = self._ermrest.get_data(7,"step_completed")[0]
 			self._ermrest.delete_data(7,"step_completed")
-			print("got old step")
 		except:
 			data = {"completed_step":None}
-			print("got blank step")
-		data['completed_step'] = new_step
-		try:
-			self._ermrest.put_data(7,"step_completed",data)
-			print("put data in step completed")
-			return True
-		except:
-			print("put data failed")
-			return False
 
-	def _get_experiment_slot_id(self,request):
-		slot = None
-		try:
-			if (self._slot_exists("EID",request)):
-				slot = self._get_slot_value("EID",request)
-			else:
-				slot = None
-		except:
-			slot = None
-		return slot
-		
+		data['completed_step'] = new_step
+		self._ermrest.put_data(7,"step_completed",data)
+
 	def _clear(self,table_name):
+		#clears a table
 		clean_data = self._ermrest.get_data(7,table_name,"")[0]
 		for key in clean_data:
 			clean_data[key] = None
@@ -120,11 +100,8 @@ class JarvisBaseState(object):
 
 	def _get_last_step(self,experiment_id):
 		experiment = self._ermrest.get_data(7,"experiment_data","/experiment_id="+str(experiment_id))[0]
-		print("got experiment: "+str(experiment))
 		steps = experiment['states_completed'].split(",")
-		print("split steps: "+str(steps))
 		last_step = steps[len(steps)-1]
-		print("got last step: "+str(last_step))
 		return last_step
 
 

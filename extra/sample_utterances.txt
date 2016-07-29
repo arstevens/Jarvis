@@ -20,6 +20,7 @@ ExperimentLoadingWellCountIntent There are {WellCount} samples
 ExperimentLoadingWellCountIntent {WellCount} samples
 ExperimentLoadingSampleAssignmentIntent Assign sample {SampleType} to well {WellNumber}
 ExperimentLoadingSampleAssignmentIntent Sample {SampleType} is assigned to well {WellNumber}
+ExperimentLoadingSampleAssignmentMultiIntent Assign sample {SampleType} to well {WellNumber} and {SampleTypeTwo} to well {WellNumberTwo}
 ExperimentLoadingGelDoneIntent I have loaded the gel in the electrophoresis chamber
 ExperimentPowerSupplyStartIntent I have started the power supply
 ExperimentPowerSupplyCheckIntent Can I turn off the power supply

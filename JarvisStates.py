@@ -46,8 +46,13 @@ class GetIntentState(JarvisBaseState):
 
 		elif intent_name == "GetUserNameIntent":
 			current_user = self._get_current_user()
-			self._speech_output = "The current user is, {}".format(current_user)
-			self._set_session_data("jarvis_response",self._speech_output)
+			if (current_user):
+				self._speech_output = "The current user is, {}".format(current_user)
+				self._set_session_data("jarvis_response",self._speech_output)
+			else:
+				self._speech_output = "No user is logged in at the moment."
+				self._set_session_data("jarvis_response",self._speech_output)
+
 			return "ReturnState"
 
 		elif intent_name == "LoginIntent":
@@ -66,14 +71,14 @@ class GetIntentState(JarvisBaseState):
 class ExperimentOpenCloseState(JarvisBaseState):
 	
 	def __init__(self,request,session,ermrest):
-		#Loads an unfinished experiment if the user wishes to.
-		#Continues from the point the user left off.
+		#Loads an experiment if the user wishes to.
+		#Continues from the point the user left off if incomplete.
 		super(self.__class__,self).__init__()
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
 		self._intent = self._get_intent_name(self._request)
-		self._experiment_id = self._get_experiment_slot_id(self._request)
+		self._experiment_id = self._get_slot_value("EID",self._request)
 		print('initiated get experiment')
 
 	def handle_input(self):
@@ -85,6 +90,7 @@ class ExperimentOpenCloseState(JarvisBaseState):
 		return return_value
 	
 	def _experiment_open(self):
+		#must load the last step the user completed into memory
 		completed_step = self._get_last_step(self._experiment_id)
 		success = self._set_completed_step(completed_step)
 		if (success):
@@ -107,7 +113,7 @@ class LoginState(JarvisBaseState):
 	
 	def __init__(self,request,session,ermrest):
 		#Checks if username was provided to log user in.
-		#If so, logs user in and start a session.
+		#If so, logs user in and starts a session.
 		#If not, asks user for their username.
 		super(self.__class__,self).__init__()
 		self._request = request
@@ -117,30 +123,17 @@ class LoginState(JarvisBaseState):
 	
 	def handle_input(self):
 		print("in login")
-		username = self._get_username("UserName")
-		print('got username')
+		username = self._get_slot_value("UserName",self._request).lower()
 		if (username):
-			print('in username')
 			self._speech_output = "Hello {}. Your session has begun".format(username)
 			self._set_session_data("jarvis_response",self._speech_output)
 			self._set_session_data("user",username)
-			self._clear("step_completed")
 			return "ReturnState"
 		else:
-			print("in no username")
 			self._speech_output = "No user is logged in at the moment. Please provide your username and your session will begin."
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
 	
-	def _get_username(self,slot_name):
-		try:
-			if (self._slot_exists(slot_name,self._request)):
-				return self._get_slot_value(slot_name,self._request)
-			else:
-				return None
-		except:
-			return None
-
 #===================================Logout==============================================
 class LogoutState(JarvisBaseState):
 
@@ -171,10 +164,13 @@ class ValidateState(JarvisBaseState):
 		self._possible_intent_mappings = {
 					'exp-selection': ["ExperimentGelSelectionIntent"],
 					'gel-selection':["ExperimentGelMixtureStartIntent"],
-					'mixture-start':["ExperimentGelMixtureEndIntent","ExperimentGelMixtureDoneIntent"],
+					'mixture-start':["ExperimentGelMixtureEndIntent",
+							"ExperimentGelMixtureDoneIntent"],
 					'mixture-end':["ExperimentLoadingGelStartIntent"],
 					'gel-loading-start':["ExperimentLoadingWellCountIntent"],
-					'sample-count':["ExperimentLoadingSampleAssignmentIntent","ExperimentLoadingGelDoneIntent"],
+					'sample-count':["ExperimentLoadingSampleAssignmentIntent",
+							"ExperimentLoadingSampleAssignmentMultiIntent",
+							"ExperimentLoadingGelDoneIntent"],
 					'gel-loading-end':["ExperimentPowerSupplyStartIntent"],
 					'power-start':["ExperimentPowerSupplyEndIntent","ExperimentPowerSupplyCheckIntent"],
 					'power-end':["ExperimentEndIntent"],
@@ -186,36 +182,40 @@ class ValidateState(JarvisBaseState):
 	def handle_input(self):
 		print("in validate state")
 		last_step = self._get_completed_step()
-		print("Last Step:",last_step)
 		intent_name = self._get_intent_name(self._request)
 		valid_intents = None
 		
 		if (last_step != None):
-			print("in last step not none")
+			#if a step is completed get the possible next steps
 			valid_intents = self._possible_intent_mappings[last_step]
 
-		elif (last_step == None and (intent_name == "ExperimentStartIntent" or
-						intent_name == "ExperimentSelectionIntent")):
-			print("last step is none")
-			id_number = self._get_experiment_slot_id(self._request)
-			if (self._is_id_taken(id_number)):
-				self._speech_output = "The expeirment id you chose is already taken"
-				self._set_session_data("jarvis_response",self._speech_output)
-				return "Return State"
-			return "IntentState"
-		
-		if intent_name in valid_intents:
-			print("in valid intents")
-			return "IntentState"
+		elif (last_step == None):
+			#if no steps have been completed
+			if (intent_name == "ExperimentStartIntent"):
+				return "IntentState"
 
+			elif (intent_name == "ExperimentSelectionIntent"):
+				id_number = int(self._get_slot_value("EID",self._request))
+				print(id_number)
+				#checks if the experiment id has already been taken
+				if (self._is_id_taken(id_number)):
+					print("in true!")
+					self._speech_output = "The expeirment id you chose is already taken"
+					self._set_session_data("jarvis_response",self._speech_output)
+					return "ReturnState"
+				return "IntentState"
+
+		if (intent_name in valid_intents):
+			return "IntentState"
+			
 		else:
-			print("Else")
-			self._speech_output = "Your input was invalid. If not, check the logs"
+			self._speech_output = "Your input was invalid." 
 			self._set_session_data("jarvis_response",self._speech_output)
 			return "ReturnState"
 
 	
 	def _get_completed_step(self):
+		#gets the previous step the user completed
 		try:
 			last_step = self._ermrest.get_data(7,"step_completed")[0]
 			last_step = last_step['completed_step']
@@ -228,24 +228,19 @@ class ValidateState(JarvisBaseState):
 		current_user = self._get_current_user()
 		experiment_ids = []
 
-		if (current_user != None):
-			experiments = self._ermrest.get_data(7,"experiment_data","/user="+current_user)
-		else:
-			return False
+		experiments = self._ermrest.get_data(7,"experiment_data","/user="+current_user)
 
+		if (len(experiments) == 0):
+			#user has no experiments yet
+			return False
+		
 		for experiment in experiments:
-			experiment_ids.append(experiment['experiment_id'])
+			experiment_ids.append(int(experiment['experiment_id']))
 
 		if id_number in experiment_ids:
 			return True
 		return False
 
-		
-
-		
-
-
-	
 #===================================Intent==============================================
 class IntentState(JarvisBaseState):
 	
@@ -256,16 +251,12 @@ class IntentState(JarvisBaseState):
 		self._request = request
 		self._session = session
 		self._ermrest = ermrest
-		try:
-			self._user = self._ermrest.get_data(7,"session_info")[0]["user"]
-		except:
-			self._user = None
+		self._user = self._ermrest.get_data(7,"session_info")[0]["user"]
 		self._intent = self._get_intent_name(request)
 		self._experiment_id = self._get_experiment_id(self._request,self._ermrest)
-		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest)
-		self._data_retriever = DataRetrieval(self._ermrest,self._experiment_id,self._user)
+		self._experiment_handler = GelElectrophoresis(self._user,self._experiment_id,self._ermrest) #contains methods for each experiment intent
+		self._data_retriever = DataRetrieval(self._ermrest,self._experiment_id,self._user) #contains methods for get intents
 		print("initiated intent")
-				
 	
 	def handle_input(self):
 		print("in IntentState")
@@ -276,8 +267,12 @@ class IntentState(JarvisBaseState):
 				sample_type = self._get_slot_value("SampleType",self._request)
 				well_number = self._get_slot_value("WellNumber",self._request)
 				self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent(sample_type,well_number)	
+			elif self._intent == "ExperimentLoadingSampleAssignmentMultiIntent":
+				sample_types = [self._get_slot_value("SampleType",self._request),self._get_slot_value("SampleTypeTwo",self._request)]
+				well_numbers = [self._get_slot_value("WellNumber",self._request),self._get_slot_value("WellNumberTwo",self._request)]
+				self._experiment_handler.experiment_loading_sample_assignment_intent(sample_types[0],well_numbers[0])
+				self._speech_output = self._experiment_handler.experiment_loading_sample_assignment_intent(sample_types[1],well_numbers[1])
 			elif self._intent == "ExperimentSelectionIntent":
-				print("In experiment selection intent")
 				experiment_name = self._get_slot_value("ExperimentName",self._request)
 				self._speech_output = self._experiment_handler.experiment_selection_intent(experiment_name)
 			elif self._intent == "ExperimentGelSelectionIntent":
@@ -322,15 +317,14 @@ class IntentState(JarvisBaseState):
 				well_number = self._get_slot_value("WellNumber",self._request)
 				self._speech_output = self._data_retriever.get_well_sample_assignment_intent(well_number)
 			elif self._intent == "GetSampleWellAssignmentIntent":
-				sample = self._get_slot_value("SampleType",self._request)
+				sample = self._get_slot_value("SampleType",self._request).upper() #Must be upper case for correct pronounciation
 				self._speech_output = self._data_retriever.get_sample_well_assignment_intent(sample)
 
 		#Set the output response for ReturnState and set the completed step
 		self._set_session_data("jarvis_response",self._speech_output)
-		print("set jarvis response")
+		#Set the completed step (ExperimentStartIntent doesn't count as a step completed) 
 		if self._intent != "ExperimentStartIntent":
 			self._set_completed_step(self._get_last_step(self._experiment_id))
-			print("set completed step")
 
 		return "ReturnState"
 	
@@ -341,7 +335,7 @@ class IntentState(JarvisBaseState):
 
 		elif (self._intent == "ExperimentSelectionIntent" or
 			self._intent == "ExperimentOpenIntent"):
-			eid = int(self._get_experiment_slot_id(request))
+			eid = int(self._get_slot_value("EID",self._request))
 			self._set_session_data("current_experiment_id",eid)
 
 		else:

@@ -12,17 +12,14 @@ class DataRetrieval(object):
 		self._username = user 
 	
 	def get_experiment_id_intent(self):
-		#returns the response for the GetExperimentIdIntent
 		return "The ID is, "+num2words(int(self._experiment_id))
 	
 	def get_start_date_intent(self):
-		#gets the start date of the experiment and constructs response
 		start_date = self._get_experiment_data("start_date")
 		speakable_time = self._epoch_to_time(start_date)
 		return "You started this experiment on, "+speakable_time
 	
 	def get_end_date_intent(self):
-		#gets the end date of the experiment and constructs response
 		end_date = self._get_experiment_data("end_date")
 		speakable_time = self._epoch_to_time(end_date)
 		return "You ended this experiment on, "+speakable_time
@@ -64,7 +61,9 @@ class DataRetrieval(object):
 	def _epoch_to_time(self,timestamp):
 		#creates and returns a speakable version of the date for alexa
 		print("in epoch")
+		print(timestamp)
 		time_date = timestamp.split(" ") 
+		print(time_date)
 		new_date = ""
 
 		#Adds day of the week to new_date
@@ -126,11 +125,11 @@ class DataRetrieval(object):
 		for number in range(len(date_time)):
 			date_time[number] = num2words(int(date_time[number])) 
 
-		new_date += " ".join(date_time)
+		new_date += " ".join(date_time[0:2])
 		if past_noon:
 			new_date += " PM"
 		else:
-			past_noon += " AM"
+			new_date += " AM"
 
 		#return
 		return new_date
